@@ -6,14 +6,16 @@ A bilingual (Arabic-default, RTL) grocery storefront and staff admin console for
 market. Cash on delivery only, fulfilled by an in-house fleet. The site's job is to capture
 correct orders cheaply and safely.
 
-**Status**: Stages 1–2 complete — Next.js on Cloudflare Workers with a bilingual Arabic-first
-RTL shell, and the full data layer with 103 passing SQL assertions. Stage 3 (storefront) is next.
+**Status**: Stages 1–4 complete — Next.js on Cloudflare Workers with a bilingual Arabic-first
+RTL shell, the full data layer with 134 passing SQL assertions, the storefront through to a
+placed order, and a staff console that runs the catalog, promotions and delivery pricing without
+a developer. Stage 5 (order operations) is next.
 
 ```bash
 npm install && npm run dev              # http://localhost:3000 → /ar
 npm run cf:build && npx wrangler dev    # the real Workers bundle
 supabase start && supabase db reset     # schema + seed
-./scripts/run-sql-tests.sh              # pricing, orders, transitions, RLS
+./scripts/run-sql-tests.sh              # pricing, orders, transitions, RLS, admin
 ./scripts/test-concurrency.sh           # two orders race for the last unit
 ```
 
@@ -61,7 +63,14 @@ Contracts: [RPC functions](specs/001-egyptian-grocery-ecommerce/contracts/rpc-co
 3. **All money is integer piastres.** A one-piastre floating-point drift is a cash dispute at
    the door when the driver collects.
 
-4. **Phone-only auth with no SMS and no email.** Numbers normalize to `+201XXXXXXXXX` and map
+4. **Delivery pricing is data, not code.** The fee, the minimum order value and whether a
+   governorate is served at all are three editable numbers per row in the admin console,
+   changeable at any moment with no deployment. A change applies to the next cart priced; orders
+   already placed keep the fee the customer was quoted, because the order stores its own copy.
+   Every change writes the before and after to `admin_audit_log` with the name of whoever made
+   it, so "when did the fee to Giza go up, and who raised it" always has an answer.
+
+5. **Phone-only auth with no SMS and no email.** Numbers normalize to `+201XXXXXXXXX` and map
    to a synthetic internal identifier over Supabase Auth, keeping password hashing, JWTs and
    `auth.uid()` in RLS. The trade-off — no self-service password reset — is handled by a
    staff-mediated reset with an audit trail.
@@ -72,9 +81,9 @@ Contracts: [RPC functions](specs/001-egyptian-grocery-ecommerce/contracts/rpc-co
 |---|---|
 | 1. Foundation ✅ | Next.js on Workers, Supabase project, RTL shell, CI |
 | 2. Data layer ✅ | 15 tables, RLS, pricing and order functions, tests |
-| 3. Storefront 🎯 | Register, browse, cart, checkout — **MVP, real orders** |
-| 4. Admin | Products, categories, brands, promotions, governorates |
-| 5. Order operations | Staff queue and transitions; customer tracking |
+| 3. Storefront ✅ | Register, browse, cart, checkout — **MVP, real orders** |
+| 4. Admin ✅ | Products, categories, brands, promotions, governorates |
+| 5. Order operations 🎯 | Staff queue and transitions; customer tracking |
 | 6. Reporting | Dashboard, sales/customer/promotion reports, CSV and Excel export |
 | 7. Discovery | Arabic/English search, offers, scheduled jobs, hardening |
 

@@ -236,33 +236,33 @@ languages and photos, and the product appears on the storefront.
 
 *May proceed in parallel with Phase 3 once Phase 2 is complete — the routes are disjoint.*
 
-- [ ] T063 [US3] `src/app/[locale]/admin/layout.tsx` — staff gate plus per-request re-check.
+- [x] T063 [US3] `src/app/[locale]/admin/layout.tsx` — staff gate plus per-request re-check.
       Convenience only; RLS remains the boundary (FR-064, FR-065)
-- [ ] T064 [P] [US3] `src/components/admin/DataTable.tsx` — sortable, filterable, mobile-usable
-- [ ] T065 [P] [US3] `src/components/admin/BilingualField.tsx` — paired Arabic/English input
+- [x] T064 [P] [US3] `src/components/admin/DataTable.tsx` — sortable, filterable, mobile-usable
+- [x] T065 [P] [US3] `src/components/admin/BilingualField.tsx` — paired Arabic/English input
       that refuses to submit with either side blank (FR-057)
-- [ ] T066 [US3] `src/lib/image-resize.ts` — browser canvas resize to 1200px WebP plus a 400px
+- [x] T066 [US3] `src/lib/image-resize.ts` — browser canvas resize to 1200px WebP plus a 400px
       thumbnail, before upload (research R12, FR-068)
-- [ ] T067 [US3] `src/components/admin/ImageUploader.tsx` — multi-upload, drag-reorder, set
+- [x] T067 [US3] `src/components/admin/ImageUploader.tsx` — multi-upload, drag-reorder, set
       primary, delete (FR-054)
-- [ ] T068 [US3] `src/lib/actions/admin/products.ts` — create and update covering every FR-051
+- [x] T068 [US3] `src/lib/actions/admin/products.ts` — create and update covering every FR-051
       attribute, refusing a missing name in either language
-- [ ] T069 [US3] `src/app/[locale]/admin/products/` — list, create and edit forms
-- [ ] T070 [US3] Cost-price field on the product form, admin-only, writing `product_costs`
+- [x] T069 [US3] `src/app/[locale]/admin/products/` — list, create and edit forms
+- [x] T070 [US3] Cost-price field on the product form, admin-only, writing `product_costs`
       (FR-059, FR-060)
-- [ ] T071 [P] [US3] `src/app/[locale]/admin/categories/` — tree management, reorder, activate
+- [x] T071 [P] [US3] `src/app/[locale]/admin/categories/` — tree management, reorder, activate
       (FR-053)
-- [ ] T072 [P] [US3] `src/app/[locale]/admin/brands/` — brand management (FR-053)
-- [ ] T073 [P] [US3] `src/app/[locale]/admin/promotions/` — discount type, value, date range,
+- [x] T072 [P] [US3] `src/app/[locale]/admin/brands/` — brand management (FR-053)
+- [x] T073 [P] [US3] `src/app/[locale]/admin/promotions/` — discount type, value, date range,
       scope selection (FR-055)
-- [ ] T074 [P] [US3] `src/app/[locale]/admin/governorates/` — the full list of 27 with fee,
+- [x] T074 [P] [US3] `src/app/[locale]/admin/governorates/` — the full list of 27 with fee,
       minimum order value and an activate toggle; inactive ones visually distinct so staff can see
       at a glance where delivery runs (FR-056, FR-056a)
-- [ ] T075 [US3] `src/app/[locale]/admin/staff/` — staff accounts, role assignment, and the
+- [x] T075 [US3] `src/app/[locale]/admin/staff/` — staff accounts, role assignment, and the
       staff-mediated password reset writing `admin_audit_log` (FR-016, FR-060)
-- [ ] T076 [US3] Deactivate-instead-of-delete behaviour across all admin entities, with a clear
+- [x] T076 [US3] Deactivate-instead-of-delete behaviour across all admin entities, with a clear
       message when a record is referenced by an order (FR-061)
-- [ ] T077 [US3] `tests/integration/admin-authz.test.ts` — a customer and a staff member each
+- [x] T077 [US3] `tests/integration/admin-authz.test.ts` — a customer and a staff member each
       denied on admin-only routes and on `product_costs`
 
 **Checkpoint**: Staff run the catalog end to end without a developer.
