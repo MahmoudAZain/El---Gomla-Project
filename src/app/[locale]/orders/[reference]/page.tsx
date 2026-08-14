@@ -4,7 +4,11 @@ import { Link } from '@/i18n/navigation';
 import { getOrderByReference } from '@/lib/queries/orders';
 import { getCurrentProfile } from '@/lib/actions/auth';
 import { formatMoney, formatNumber } from '@/lib/money';
+import { StatusTimeline, type HistoryEntry } from '@/components/orders/StatusTimeline';
+import { CancelOrder } from '@/components/orders/CancelOrder';
+import { customerMayCancel } from '@/lib/order-status';
 import type { Locale } from '@/i18n/routing';
+import type { OrderStatus } from '@/types/database';
 
 export default async function OrderDetailPage({
   params,
@@ -46,17 +50,12 @@ export default async function OrderDetailPage({
     line_total: number;
   }[];
 
-  const history = (
-    order.order_status_history as {
-      id: string;
-      to_status: string;
-      actor_role: string;
-      note: string | null;
-      created_at: string;
-    }[]
-  ).sort((a, b) => a.created_at.localeCompare(b.created_at));
-
   const justPlaced = placed === '1';
+
+  // The database decides this too, under a row lock. Hiding the control once
+  // the order has moved on spares the customer a refusal they cannot act on
+  // (FR-048).
+  const mayCancel = customerMayCancel(order.status as OrderStatus);
 
   return (
     <div className="flex flex-col gap-6">
@@ -161,18 +160,10 @@ export default async function OrderDetailPage({
           log staff do — nothing here is hidden from them (FR-047). */}
       <section className="flex flex-col gap-3">
         <h2 className="text-lg font-bold text-ink">{t('timeline')}</h2>
-        <ol className="flex flex-col gap-2 border-s-2 border-rule ps-4">
-          {history.map((entry) => (
-            <li key={entry.id} className="flex flex-col">
-              <span className="font-semibold text-ink">{t(`statuses.${entry.to_status}`)}</span>
-              <span className="text-xs text-ink-3">
-                {format.dateTime(new Date(entry.created_at), 'full')}
-              </span>
-              {entry.note && <span className="text-sm text-ink-2">{entry.note}</span>}
-            </li>
-          ))}
-        </ol>
+        <StatusTimeline history={order.order_status_history as HistoryEntry[]} />
       </section>
+
+      {mayCancel && <CancelOrder orderId={order.id} />}
 
       <div className="flex flex-wrap gap-3">
         <Link

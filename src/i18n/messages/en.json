@@ -145,8 +145,8 @@
     "total": "Total",
     "items": "Items",
     "viewDetail": "Details",
-    "cancelOrder": "Cancel order",
-    "cancelConfirm": "Are you sure you want to cancel this order?",
+    "cancelOrder": "Cancel this order",
+    "cancelConfirm": "Cancel this order? This cannot be undone.",
     "timeline": "Order history",
     "deliveryTo": "Delivering to",
     "statuses": {
@@ -157,7 +157,13 @@
       "delivered": "Delivered",
       "cancelled": "Cancelled",
       "returned": "Returned"
-    }
+    },
+    "noHistory": "Nothing recorded yet.",
+    "byCustomer": "by the customer",
+    "cancelWindowHint": "You can cancel until we confirm it by phone.",
+    "cancelYes": "Yes, cancel it",
+    "cancelNo": "Keep the order",
+    "cancelling": "Cancelling…"
   },
   "auth": {
     "registerTitle": "Create an account",
@@ -209,7 +215,6 @@
     "promotionsBlurb": "Discounts with a start and an end",
     "deliveryBlurb": "Fees, minimums and where you deliver",
     "staffBlurb": "Accounts, roles and password resets",
-
     "allOption": "All",
     "rowCount": "{count} rows",
     "sort": "sort",
@@ -228,11 +233,9 @@
     "inactive": "inactive",
     "status": "Status",
     "visibleInShop": "Visible in the shop",
-
     "arabic": "Arabic",
     "english": "English",
     "bothLanguagesRequired": "Both languages are required — a product with no Arabic name is invisible to most customers.",
-
     "newProduct": "New product",
     "editProduct": "Edit product",
     "searchProducts": "Search by name, SKU or category",
@@ -272,7 +275,6 @@
       "chilled": "Chilled",
       "frozen": "Frozen"
     },
-
     "photos": "Photos",
     "photosRemaining": "{count} more allowed",
     "photosAfterSave": "Photos can be added once the product is saved.",
@@ -283,7 +285,6 @@
     "moveEarlier": "Move earlier",
     "moveLater": "Move later",
     "deletePhoto": "Delete photo",
-
     "newCategory": "New category",
     "editCategory": "Edit category",
     "categoryName": "Category name",
@@ -291,11 +292,9 @@
     "parentCategoryHint": "Up to three levels deep",
     "topLevel": "Top level",
     "productCount": "{count} products",
-
     "newBrand": "New brand",
     "editBrand": "Edit brand",
     "brandName": "Brand name",
-
     "newPromotion": "New promotion",
     "editPromotion": "Edit promotion",
     "promotionName": "Promotion name",
@@ -319,7 +318,6 @@
     "promoLive": "Running now",
     "promoScheduled": "Scheduled",
     "promoEnded": "Ended",
-
     "governorateHelp": "Change a fee, a minimum or coverage whenever you need to — the new numbers apply to the next order placed. Orders already placed keep the fee the customer was quoted, and every change here is recorded with your name against it.",
     "coverageSummary": "Delivering to {active} of {total} governorates",
     "deliveryFeeEgp": "Delivery fee (EGP)",
@@ -329,7 +327,6 @@
     "saveChangedRows": "Save {count} changed",
     "unsavedChanges": "Unsaved changes",
     "governoratesSaved": "{count} governorates updated",
-
     "staffAccounts": "Staff accounts",
     "newStaffAccount": "New staff account",
     "accountDisabled": "Account disabled",
@@ -351,7 +348,33 @@
     "resettingFor": "Setting a new password for {name} ({phone})",
     "resetIsAudited": "This will be recorded in the audit log against your account.",
     "confirmReset": "Set new password",
-    "passwordReset": "Password changed ✓"
+    "passwordReset": "Password changed ✓",
+    "orders": "Orders",
+    "ordersBlurb": "The queue, transitions and delivery details",
+    "ordersToday": "Orders",
+    "openQueue": "Open the queue",
+    "needsAttention": "Waiting on someone",
+    "masterData": "Master data",
+    "searchOrders": "Reference or mobile number",
+    "statusOpen": "Still open",
+    "statusAll": "All states",
+    "governorate": "Governorate",
+    "fromDate": "From",
+    "toDate": "To",
+    "applyFilters": "Apply",
+    "clearFilters": "Clear",
+    "noOrders": "No orders match.",
+    "itemCount": "{count} items",
+    "backToQueue": "Back to the queue",
+    "moveOrder": "Move this order",
+    "transitionNote": "Note (optional)",
+    "transitionNotePlaceholder": "e.g. customer asked for delivery after 6pm",
+    "confirmTransition": "Mark as {status}?",
+    "yesDoIt": "Yes, do it",
+    "orderTerminal": "This order is {status} and cannot move any further.",
+    "deliveryDetails": "Delivery",
+    "landmarkLabel": "Landmark",
+    "customerNote": "Customer note"
   },
   "adminErrors": {
     "notAuthorized": "You're not allowed to make this change",
@@ -395,7 +418,8 @@
     "invalidCart": "There's a problem with your cart",
     "pricingFailed": "We couldn't calculate prices just now",
     "orderFailed": "We couldn't place your order. Please try again.",
-    "cancelFailed": "We couldn't cancel the order"
+    "cancelFailed": "We couldn't cancel the order",
+    "transitionFailed": "We couldn't change the order's status. Please try again."
   },
   "orderErrors": {
     "not_authenticated": "Sign in to complete your order",

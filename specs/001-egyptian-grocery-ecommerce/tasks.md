@@ -281,26 +281,26 @@ customer cancels while submitted but is refused once confirmed.
 
 ### Staff (US4)
 
-- [ ] T078 [US4] `src/lib/actions/orders.ts` → `transitionOrder` calling `set_order_status`,
+- [x] T078 [US4] `src/lib/actions/orders.ts` → `transitionOrder` calling `set_order_status`,
       mapping typed errors to localized messages
-- [ ] T079 [US4] `src/app/[locale]/admin/orders/page.tsx` — queue with filters by state, governorate
+- [x] T079 [US4] `src/app/[locale]/admin/orders/page.tsx` — queue with filters by state, governorate
       and date, and search by reference or customer phone (FR-058)
-- [ ] T080 [US4] `src/app/[locale]/admin/orders/[id]/page.tsx` — detail with lines, the delivery
+- [x] T080 [US4] `src/app/[locale]/admin/orders/[id]/page.tsx` — detail with lines, the delivery
       address **including landmark**, transition controls offering only legal next states, and a
       note field (FR-049)
-- [ ] T081 [P] [US4] `src/components/orders/StatusTimeline.tsx` — history with actor, note and
+- [x] T081 [P] [US4] `src/components/orders/StatusTimeline.tsx` — history with actor, note and
       timestamp, rendering in both directions
-- [ ] T082 [US4] `src/app/[locale]/admin/page.tsx` — dashboard with order counts by state
+- [x] T082 [US4] `src/app/[locale]/admin/page.tsx` — dashboard with order counts by state
 
 ### Customer (US5)
 
-- [ ] T083 [P] [US5] `src/app/[locale]/orders/page.tsx` — own order history, newest first
+- [x] T083 [P] [US5] `src/app/[locale]/orders/page.tsx` — own order history, newest first
       (FR-062)
-- [ ] T084 [US5] `src/app/[locale]/orders/[reference]/page.tsx` — detail with the status
+- [x] T084 [US5] `src/app/[locale]/orders/[reference]/page.tsx` — detail with the status
       timeline, and a cancel control shown only while `submitted` (FR-048)
-- [ ] T085 [US5] `cancelMyOrder` action, plus handling for the case where staff confirmed
+- [x] T085 [US5] `cancelMyOrder` action, plus handling for the case where staff confirmed
       first — "this order has already moved on" (FR-050)
-- [ ] T086 [US5] `tests/integration/order-lifecycle.test.ts` — full lifecycle, customer cancel
+- [x] T086 [US5] `tests/integration/order-lifecycle.test.ts` — full lifecycle, customer cancel
       allowed then refused, cross-customer access denied (SC-010, SC-011)
 
 **Checkpoint**: The operation runs end to end with an audit trail that no one can edit.

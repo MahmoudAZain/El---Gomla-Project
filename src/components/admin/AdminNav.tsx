@@ -13,6 +13,7 @@ import { Link } from '@/i18n/navigation';
  */
 
 const SECTIONS = [
+  { href: '/admin/orders', key: 'orders' },
   { href: '/admin/products', key: 'products' },
   { href: '/admin/categories', key: 'categories' },
   { href: '/admin/brands', key: 'brands' },

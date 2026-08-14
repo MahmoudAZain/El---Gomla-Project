@@ -146,7 +146,7 @@
     "items": "المنتجات",
     "viewDetail": "التفاصيل",
     "cancelOrder": "إلغاء الطلب",
-    "cancelConfirm": "متأكد إنك عايز تلغي الطلب ده؟",
+    "cancelConfirm": "متأكد إنك عايز تلغي الطلب؟ مش هينفع ترجع فيه.",
     "timeline": "سجل الطلب",
     "deliveryTo": "التوصيل إلى",
     "statuses": {
@@ -157,7 +157,13 @@
       "delivered": "تم التسليم",
       "cancelled": "ملغي",
       "returned": "مرتجع"
-    }
+    },
+    "noHistory": "مافيش حاجة اتسجلت لسه.",
+    "byCustomer": "بواسطة العميل",
+    "cancelWindowHint": "تقدر تلغي لحد ما نأكد الطلب بالتليفون.",
+    "cancelYes": "أيوه، ألغِ الطلب",
+    "cancelNo": "لأ، سيبه",
+    "cancelling": "جارٍ الإلغاء…"
   },
   "auth": {
     "registerTitle": "إنشاء حساب",
@@ -209,7 +215,6 @@
     "promotionsBlurb": "خصومات ليها بداية ونهاية",
     "deliveryBlurb": "الرسوم والحد الأدنى وأماكن التوصيل",
     "staffBlurb": "الحسابات والصلاحيات وتغيير كلمات السر",
-
     "allOption": "الكل",
     "rowCount": "{count} صف",
     "sort": "ترتيب",
@@ -228,11 +233,9 @@
     "inactive": "موقوف",
     "status": "الحالة",
     "visibleInShop": "يظهر في المتجر",
-
     "arabic": "بالعربي",
     "english": "بالإنجليزي",
     "bothLanguagesRequired": "اللغتين مطلوبتين — منتج من غير اسم عربي مش هيشوفه أغلب العملاء.",
-
     "newProduct": "منتج جديد",
     "editProduct": "تعديل المنتج",
     "searchProducts": "ابحث بالاسم أو الكود أو القسم",
@@ -272,7 +275,6 @@
       "chilled": "مبرد",
       "frozen": "مجمد"
     },
-
     "photos": "الصور",
     "photosRemaining": "متبقي {count}",
     "photosAfterSave": "تقدر تضيف الصور بعد ما تحفظ المنتج.",
@@ -283,7 +285,6 @@
     "moveEarlier": "تحريك للأمام",
     "moveLater": "تحريك للخلف",
     "deletePhoto": "حذف الصورة",
-
     "newCategory": "قسم جديد",
     "editCategory": "تعديل القسم",
     "categoryName": "اسم القسم",
@@ -291,11 +292,9 @@
     "parentCategoryHint": "لحد ثلاث مستويات",
     "topLevel": "قسم رئيسي",
     "productCount": "{count} منتج",
-
     "newBrand": "ماركة جديدة",
     "editBrand": "تعديل الماركة",
     "brandName": "اسم الماركة",
-
     "newPromotion": "عرض جديد",
     "editPromotion": "تعديل العرض",
     "promotionName": "اسم العرض",
@@ -319,7 +318,6 @@
     "promoLive": "شغال دلوقتي",
     "promoScheduled": "مجدول",
     "promoEnded": "انتهى",
-
     "governorateHelp": "غيّر الرسوم أو الحد الأدنى أو التغطية في أي وقت — الأرقام الجديدة بتسري على الطلب اللي بعده. الطلبات اللي اتعملت خلاص بتفضل بالرسوم اللي العميل شافها، وكل تغيير هنا بيتسجّل باسمك.",
     "coverageSummary": "التوصيل شغال في {active} من {total} محافظة",
     "deliveryFeeEgp": "رسوم التوصيل (ج.م)",
@@ -329,7 +327,6 @@
     "saveChangedRows": "حفظ {count} تعديل",
     "unsavedChanges": "فيه تعديلات لسه مااتحفظتش",
     "governoratesSaved": "تم تحديث {count} محافظة",
-
     "staffAccounts": "حسابات الموظفين",
     "newStaffAccount": "حساب موظف جديد",
     "accountDisabled": "الحساب موقوف",
@@ -351,7 +348,33 @@
     "resettingFor": "بتحط كلمة سر جديدة لـ {name} ({phone})",
     "resetIsAudited": "ده هيتسجّل في سجل المراجعة على حسابك.",
     "confirmReset": "تأكيد كلمة السر",
-    "passwordReset": "تم تغيير كلمة السر ✓"
+    "passwordReset": "تم تغيير كلمة السر ✓",
+    "orders": "الطلبات",
+    "ordersBlurb": "قائمة الطلبات والحالات وبيانات التوصيل",
+    "ordersToday": "الطلبات",
+    "openQueue": "افتح القائمة",
+    "needsAttention": "مستني حد",
+    "masterData": "البيانات الأساسية",
+    "searchOrders": "رقم الطلب أو الموبايل",
+    "statusOpen": "لسه مفتوح",
+    "statusAll": "كل الحالات",
+    "governorate": "المحافظة",
+    "fromDate": "من",
+    "toDate": "إلى",
+    "applyFilters": "تطبيق",
+    "clearFilters": "مسح",
+    "noOrders": "مافيش طلبات مطابقة.",
+    "itemCount": "{count} صنف",
+    "backToQueue": "رجوع للقائمة",
+    "moveOrder": "تحريك الطلب",
+    "transitionNote": "ملاحظة (اختياري)",
+    "transitionNotePlaceholder": "مثال: العميل طلب التوصيل بعد 6 المسا",
+    "confirmTransition": "تحويل الطلب إلى {status}؟",
+    "yesDoIt": "أيوه، نفّذ",
+    "orderTerminal": "الطلب ده {status} ومايقدرش يتحرك أكتر من كده.",
+    "deliveryDetails": "التوصيل",
+    "landmarkLabel": "علامة مميزة",
+    "customerNote": "ملاحظة العميل"
   },
   "adminErrors": {
     "notAuthorized": "مش مسموح لك بالتعديل ده",
@@ -395,7 +418,8 @@
     "invalidCart": "في مشكلة في السلة",
     "pricingFailed": "مانفعش نحسب الأسعار دلوقتي",
     "orderFailed": "مانفعش نأكد الطلب. حاول تاني.",
-    "cancelFailed": "مانفعش نلغي الطلب"
+    "cancelFailed": "مانفعش نلغي الطلب",
+    "transitionFailed": "مانقدرش نغيّر حالة الطلب. حاول تاني."
   },
   "orderErrors": {
     "not_authenticated": "سجّل دخولك علشان تكمل الطلب",
