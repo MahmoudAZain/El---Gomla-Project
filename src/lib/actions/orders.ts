@@ -1,5 +1,6 @@
 'use server';
 
+import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { previewCartSchema, placeOrderSchema } from '@/lib/validation/schemas';
 import type { CartPreview, PlacedOrder } from '@/types/database';
@@ -93,6 +94,50 @@ export async function placeOrder(input: {
 }
 
 /**
+ * A staff transition (FR-045, FR-046, FR-049).
+ *
+ * The screen offers only the transitions the state machine permits, but this
+ * function does not re-check them and must not: `set_order_status()` holds the
+ * table, re-reads the status inside a row lock, and writes the history entry in
+ * the same transaction. A check here would be a second opinion that can drift
+ * from the first.
+ *
+ * The lock is what makes the awkward case correct. A customer cancelling at the
+ * same moment staff confirm serializes at the database; the loser finds a status
+ * their transition is not legal from, and is told so (FR-050).
+ */
+const TRANSITION_ERRORS = new Set([
+  'not_authenticated',
+  'order_not_found',
+  'not_authorized',
+  'invalid_transition',
+  'order_already_moved',
+]);
+
+export async function transitionOrder(
+  orderId: string,
+  newStatus: string,
+  note?: string,
+): Promise<ActionResult> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc('set_order_status', {
+    p_order_id: orderId,
+    p_new_status: newStatus,
+    p_note: note?.trim() || null,
+  });
+
+  if (error) {
+    const message = error.message ?? '';
+    const known = [...TRANSITION_ERRORS].find((e) => message.includes(e));
+    return { ok: false, error: known ? `orderErrors.${known}` : 'errors.transitionFailed' };
+  }
+
+  // The queue and the detail screen both show a status that has just changed.
+  revalidatePath('/', 'layout');
+  return { ok: true, data: undefined };
+}
+
+/**
  * Customer self-cancellation.
  *
  * Permitted only while the order is still `submitted`. The database decides
@@ -118,5 +163,6 @@ export async function cancelMyOrder(orderId: string): Promise<ActionResult> {
     return { ok: false, error: 'errors.cancelFailed' };
   }
 
+  revalidatePath('/', 'layout');
   return { ok: true, data: undefined };
 }

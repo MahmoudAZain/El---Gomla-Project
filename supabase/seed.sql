@@ -3,42 +3,25 @@
 -- Applied by `supabase db reset` after the migrations. Safe to re-run.
 
 -- ---------------------------------------------------------------------------
--- Governorates — all 27, so extending coverage is a toggle and two numbers
--- rather than data entry (FR-056a).
+-- Delivery coverage — LOCAL DEVELOPMENT ONLY
 --
--- Only Cairo and Giza are active. Their fee and minimum are PLACEHOLDERS
--- pending the real figures from the business — they decide what every customer
--- is charged and which orders get refused, so replace them before launch.
+-- The 27 governorates themselves are reference data and arrive from migration
+-- 0018, so they exist on every deployment. What lives here is the part that is
+-- a business decision rather than a fact about Egypt: which are served, at what
+-- fee, above what minimum.
+--
+-- These two rows exist so a fresh local stack has a checkout that works. The
+-- numbers are PLACEHOLDERS and deliberately never reach production — a hosted
+-- project gets its coverage from /admin/governorates, where the business sets
+-- it without a deploy (FR-056a).
 -- ---------------------------------------------------------------------------
-insert into public.governorates (name_ar, name_en, delivery_fee, min_order_value, is_active, sort_order) values
-  ('القاهرة',        'Cairo',           2500, 15000, true,  1),   -- PLACEHOLDER: 25.00 fee / 150.00 minimum
-  ('الجيزة',         'Giza',            3000, 15000, true,  2),   -- PLACEHOLDER: 30.00 fee / 150.00 minimum
-  ('الإسكندرية',     'Alexandria',         0,     0, false, 3),
-  ('القليوبية',      'Qalyubia',           0,     0, false, 4),
-  ('الشرقية',        'Sharqia',            0,     0, false, 5),
-  ('الدقهلية',       'Dakahlia',           0,     0, false, 6),
-  ('البحيرة',        'Beheira',            0,     0, false, 7),
-  ('المنوفية',       'Monufia',            0,     0, false, 8),
-  ('الغربية',        'Gharbia',            0,     0, false, 9),
-  ('كفر الشيخ',      'Kafr El Sheikh',     0,     0, false, 10),
-  ('دمياط',          'Damietta',           0,     0, false, 11),
-  ('بورسعيد',        'Port Said',          0,     0, false, 12),
-  ('الإسماعيلية',    'Ismailia',           0,     0, false, 13),
-  ('السويس',         'Suez',               0,     0, false, 14),
-  ('شمال سيناء',     'North Sinai',        0,     0, false, 15),
-  ('جنوب سيناء',     'South Sinai',        0,     0, false, 16),
-  ('الفيوم',         'Faiyum',             0,     0, false, 17),
-  ('بني سويف',       'Beni Suef',          0,     0, false, 18),
-  ('المنيا',         'Minya',              0,     0, false, 19),
-  ('أسيوط',          'Asyut',              0,     0, false, 20),
-  ('سوهاج',          'Sohag',              0,     0, false, 21),
-  ('قنا',            'Qena',               0,     0, false, 22),
-  ('الأقصر',         'Luxor',              0,     0, false, 23),
-  ('أسوان',          'Aswan',              0,     0, false, 24),
-  ('البحر الأحمر',   'Red Sea',            0,     0, false, 25),
-  ('الوادي الجديد',  'New Valley',         0,     0, false, 26),
-  ('مطروح',          'Matrouh',            0,     0, false, 27)
-on conflict (lower(name_en)) do nothing;
+update public.governorates
+   set delivery_fee = 2500, min_order_value = 15000, is_active = true   -- 25.00 fee / 150.00 minimum
+ where lower(name_en) = 'cairo';
+
+update public.governorates
+   set delivery_fee = 3000, min_order_value = 15000, is_active = true   -- 30.00 fee / 150.00 minimum
+ where lower(name_en) = 'giza';
 
 -- ---------------------------------------------------------------------------
 -- Categories — a starter grocery tree, two levels

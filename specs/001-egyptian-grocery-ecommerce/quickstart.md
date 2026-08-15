@@ -211,20 +211,103 @@ language mid-flow preserves the cart and the current page** (SC-013).
 
 ## Deployment
 
+Publishing happens from GitHub: merging to `main` runs `.github/workflows/deploy.yml`,
+which verifies the commit, applies migrations, builds the Workers bundle and deploys it.
+Set the configuration below once and every later release is a merge.
+
+### 1. Create the two accounts
+
+A Supabase project (free tier is the documented target) and a Cloudflare account.
+From Supabase → Settings → API, note the project URL, the `anon` key and the
+`service_role` key. From Cloudflare, create an API token with the **Edit Cloudflare
+Workers** template, and note the account ID.
+
+### 2. Turn off what cannot work
+
+Supabase → Authentication → Providers:
+
+- **Email confirmations: off.** Accounts are keyed to a synthetic address on a
+  non-routable domain (`<digits>@phone.elgomala.local`), so a confirmation email can
+  never arrive and every signup would hang waiting for one.
+- **Phone provider: disabled.** There is no SMS in this design; the phone number is
+  the business identity, not an auth channel.
+
+### 3. Configure the repository
+
+GitHub → Settings → Secrets and variables → Actions.
+
+| Name | Kind | Where it comes from |
+|---|---|---|
+| `SUPABASE_PROJECT_REF` | secret | The subdomain of the project URL |
+| `SUPABASE_ACCESS_TOKEN` | secret | Supabase → Account → Access Tokens |
+| `SUPABASE_DB_PASSWORD` | secret | Chosen when the project was created |
+| `NEXT_PUBLIC_SUPABASE_URL` | secret | Settings → API → Project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | secret | Settings → API → `anon` key |
+| `SUPABASE_SERVICE_ROLE_KEY` | secret | Settings → API → `service_role` key |
+| `CRON_SECRET` | secret | Generate: `openssl rand -base64 32` |
+| `CLOUDFLARE_API_TOKEN` | secret | Cloudflare → My Profile → API Tokens |
+| `CLOUDFLARE_ACCOUNT_ID` | secret | Cloudflare dashboard sidebar |
+| `NEXT_PUBLIC_SITE_URL` | **variable** | The production origin, no trailing slash |
+
+`NEXT_PUBLIC_SITE_URL` is a *variable* rather than a secret because it is not one, and
+because the smoke test at the end of the deploy prints it. On the first deploy, before a
+custom domain exists, use the `https://el-gomala.<subdomain>.workers.dev` address
+Cloudflare assigns; change it later and re-run the workflow.
+
+The anon key sits among the secrets for tidiness, not protection — it is designed to be
+public, and Row Level Security is the boundary (Principle II).
+
+### 4. Merge
+
+Merging to `main` publishes. The workflow refuses to deploy if the typecheck, lint or
+unit tests fail on the merge commit, and it applies migrations *before* deploying, so
+the Worker never queries a column the database does not have yet.
+
+### 5. Create the first admin
+
+Nobody can reach `/admin` yet: staff accounts are made by an administrator and never
+self-registered (FR-060), so the first one has to be made from outside the app. Run this
+once, locally:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=https://<ref>.supabase.co \
+SUPABASE_SERVICE_ROLE_KEY=<service_role key> \
+ADMIN_PASSWORD='<choose one now>' \
+node --experimental-strip-types scripts/bootstrap-admin.ts \
+  --phone 01001234567 --name 'Your Name'
+```
+
+Creating the user through the Supabase dashboard instead does **not** work, and fails
+confusingly: the app's notion of who someone is lives in `public.profiles`, `is_admin()`
+reads `profiles.role`, and no trigger creates that row. A dashboard-only user gets a
+login that is then refused by every policy. The script writes both rows, and normalizes
+the phone with the same function the storefront uses so the number matches at sign-in.
+
+### 6. Set delivery coverage
+
+The shop serves nowhere until you say so. Sign in, open **/ar/admin/governorates**, and
+for each governorate you deliver to set the fee, set the minimum order value, and switch
+it on. All 27 are listed; none is active and none has a fee, because those are business
+decisions and this project keeps them out of the code entirely (FR-056a). They stay
+editable from that screen forever — no deploy, no developer.
+
+### Deploying from a laptop instead
+
 ```bash
 supabase link --project-ref <ref>
-supabase db push               # Applies migrations to the hosted project
+supabase db push
 
-npm run build                  # next build + opennextjs-cloudflare build
-npx wrangler deploy
-```
-
-Secrets go to Cloudflare, not into the repository:
-
-```bash
 npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY
 npx wrangler secret put CRON_SECRET
+
+NEXT_PUBLIC_SUPABASE_URL=... NEXT_PUBLIC_SUPABASE_ANON_KEY=... \
+NEXT_PUBLIC_SITE_URL=https://... npm run cf:build
+npx wrangler deploy --var NEXT_PUBLIC_SITE_URL:https://...
 ```
+
+The `NEXT_PUBLIC_*` values must be present for the **build**, not just the deploy: Next
+inlines them into the bundle, so setting them afterwards as Worker variables does
+nothing. This is the single most common way a first deploy comes up broken.
 
 ### Scheduled jobs (`wrangler.jsonc`)
 
@@ -235,15 +318,61 @@ npx wrangler secret put CRON_SECRET
 | `0 4 * * 0` | Orphan image sweep | Reclaims storage objects no photo row references |
 | `0 5 * * 0` | Data export | **The free tier has no backups** — this is the only recovery point |
 
+Cloudflare invokes these through the `scheduled` handler, which the OpenNext-generated
+worker does not export — `worker/index.ts` adds it and delegates every request unchanged.
+Without that file the triggers fire into nothing, silently, and the keep-alive that stops
+the database pausing never runs.
+
 ### Post-deploy checklist
+
+Walk this once, on the deployed site, in this order. Everything above is automated;
+these are the things only a person can confirm.
+
+**It came up**
+
+- [ ] `https://<site>/ar` returns the storefront in Arabic, laid out right-to-left
+- [ ] `https://<site>/en` returns the same page in English, left-to-right
+- [ ] Cloudflare → Workers → el-gomala → Logs shows no startup error
+      (an `Invalid client environment` here means a `NEXT_PUBLIC_*` was missing at
+      build time — fix the secret and re-run the workflow, redeploying alone will not
+      help)
+
+**Configuration**
 
 - [ ] Email confirmations **off**; phone provider **disabled**
 - [ ] `product-images` bucket exists, public read, admin write
-- [ ] Bootstrap admin account can sign in at `/ar/admin`
-- [ ] Governorates seeded with fees and minimum order values
-- [ ] Cron triggers registered and firing
-- [ ] `SUPABASE_SERVICE_ROLE_KEY` absent from the client bundle — verify:
-      `npm run build && grep -r "service_role" .open-next/ || echo "clean"`
+      (created by migration 0011 — check Supabase → Storage)
+- [ ] `backups` bucket exists and is **private**, with no policy for any client role
+- [ ] All 27 governorates listed at `/ar/admin/governorates`
+- [ ] At least one governorate active, with a real fee and minimum order value
+- [ ] Bootstrap admin can sign in and reach `/ar/admin`
+
+**The guarantees**
+
+- [ ] Register a throwaway customer, place a small order, and confirm the total is
+      subtotal − discount + the delivery fee you just set
+- [ ] Change that governorate's fee in the admin, reload the shop: a **new** cart prices
+      at the new fee, and the order already placed still shows the old one — the driver
+      collects what the customer agreed (FR-056a)
+- [ ] `admin_audit_log` has a row for that change, naming who made it
+- [ ] Signed in as that customer, open `/ar/admin`: refused, with no admin data anywhere
+      in the response body (FR-064)
+- [ ] Sign in with a wrong password five times: further attempts are refused (FR-014)
+- [ ] View source on a storefront page and search for `service_role`: absent (FR-066)
+
+**The jobs**
+
+- [ ] Cloudflare → Workers → el-gomala → Settings → Triggers lists all four crons
+- [ ] Trigger the keep-alive by hand and confirm a 200:
+      `curl -H "Authorization: Bearer $CRON_SECRET" https://<site>/api/cron/keepalive`
+- [ ] After the first Sunday, the `backups` bucket contains a dated export.
+      **This is the only recovery point the free tier has** — if it is empty, the shop is
+      running with no backups at all
+
+**Then**
+
+- [ ] Delete the throwaway customer and its order
+- [ ] Record who holds the admin password, and where `CRON_SECRET` is kept
 
 ---
 

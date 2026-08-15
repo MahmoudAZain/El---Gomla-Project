@@ -1,7 +1,12 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "el-gomala",
-  "main": ".open-next/worker.js",
+
+  // Not `.open-next/worker.js` directly. The generated worker exports `fetch`
+  // and nothing else, so a Cron Trigger would fire into a `scheduled` handler
+  // that does not exist — silently, while the keep-alive never ran. `worker/`
+  // adds that handler and delegates every request unchanged.
+  "main": "worker/index.ts",
   "compatibility_date": "2026-08-13",
 
   // Required by @opennextjs/cloudflare: the adapter runs Next.js on the Node.js
@@ -30,11 +35,27 @@
     ]
   },
 
+  // The fallback for `wrangler dev`. A real deploy overrides it — the Deploy
+  // workflow passes `--var NEXT_PUBLIC_SITE_URL:...` from the repository
+  // variable of the same name, so the production origin is configured in GitHub
+  // rather than committed here.
+  //
+  // The scheduled handler in worker/index.ts reads this at runtime to build the
+  // URLs it calls the cron routes with. If it were left pointing at localhost
+  // in production, all four jobs would fail — including the keep-alive whose
+  // failure takes the shop offline after a quiet week.
   "vars": {
     "NEXT_PUBLIC_SITE_URL": "http://localhost:3000"
   }
 
-  // Secrets are set with `wrangler secret put`, never committed:
+  // Secrets are never committed. The Deploy workflow uploads them from GitHub
+  // secrets on every run; set them by hand with `wrangler secret put` only when
+  // deploying from a laptop:
   //   SUPABASE_SERVICE_ROLE_KEY  — bypasses RLS; server-only (FR-066)
   //   CRON_SECRET                — shared secret for the scheduled endpoints
+  //
+  // NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY are deliberately
+  // absent: Next inlines NEXT_PUBLIC_* at build time, so they must be in the
+  // build environment. Setting them here would have no effect and would suggest
+  // otherwise.
 }

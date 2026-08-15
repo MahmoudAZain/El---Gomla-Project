@@ -236,33 +236,33 @@ languages and photos, and the product appears on the storefront.
 
 *May proceed in parallel with Phase 3 once Phase 2 is complete — the routes are disjoint.*
 
-- [ ] T063 [US3] `src/app/[locale]/admin/layout.tsx` — staff gate plus per-request re-check.
+- [x] T063 [US3] `src/app/[locale]/admin/layout.tsx` — staff gate plus per-request re-check.
       Convenience only; RLS remains the boundary (FR-064, FR-065)
-- [ ] T064 [P] [US3] `src/components/admin/DataTable.tsx` — sortable, filterable, mobile-usable
-- [ ] T065 [P] [US3] `src/components/admin/BilingualField.tsx` — paired Arabic/English input
+- [x] T064 [P] [US3] `src/components/admin/DataTable.tsx` — sortable, filterable, mobile-usable
+- [x] T065 [P] [US3] `src/components/admin/BilingualField.tsx` — paired Arabic/English input
       that refuses to submit with either side blank (FR-057)
-- [ ] T066 [US3] `src/lib/image-resize.ts` — browser canvas resize to 1200px WebP plus a 400px
+- [x] T066 [US3] `src/lib/image-resize.ts` — browser canvas resize to 1200px WebP plus a 400px
       thumbnail, before upload (research R12, FR-068)
-- [ ] T067 [US3] `src/components/admin/ImageUploader.tsx` — multi-upload, drag-reorder, set
+- [x] T067 [US3] `src/components/admin/ImageUploader.tsx` — multi-upload, drag-reorder, set
       primary, delete (FR-054)
-- [ ] T068 [US3] `src/lib/actions/admin/products.ts` — create and update covering every FR-051
+- [x] T068 [US3] `src/lib/actions/admin/products.ts` — create and update covering every FR-051
       attribute, refusing a missing name in either language
-- [ ] T069 [US3] `src/app/[locale]/admin/products/` — list, create and edit forms
-- [ ] T070 [US3] Cost-price field on the product form, admin-only, writing `product_costs`
+- [x] T069 [US3] `src/app/[locale]/admin/products/` — list, create and edit forms
+- [x] T070 [US3] Cost-price field on the product form, admin-only, writing `product_costs`
       (FR-059, FR-060)
-- [ ] T071 [P] [US3] `src/app/[locale]/admin/categories/` — tree management, reorder, activate
+- [x] T071 [P] [US3] `src/app/[locale]/admin/categories/` — tree management, reorder, activate
       (FR-053)
-- [ ] T072 [P] [US3] `src/app/[locale]/admin/brands/` — brand management (FR-053)
-- [ ] T073 [P] [US3] `src/app/[locale]/admin/promotions/` — discount type, value, date range,
+- [x] T072 [P] [US3] `src/app/[locale]/admin/brands/` — brand management (FR-053)
+- [x] T073 [P] [US3] `src/app/[locale]/admin/promotions/` — discount type, value, date range,
       scope selection (FR-055)
-- [ ] T074 [P] [US3] `src/app/[locale]/admin/governorates/` — the full list of 27 with fee,
+- [x] T074 [P] [US3] `src/app/[locale]/admin/governorates/` — the full list of 27 with fee,
       minimum order value and an activate toggle; inactive ones visually distinct so staff can see
       at a glance where delivery runs (FR-056, FR-056a)
-- [ ] T075 [US3] `src/app/[locale]/admin/staff/` — staff accounts, role assignment, and the
+- [x] T075 [US3] `src/app/[locale]/admin/staff/` — staff accounts, role assignment, and the
       staff-mediated password reset writing `admin_audit_log` (FR-016, FR-060)
-- [ ] T076 [US3] Deactivate-instead-of-delete behaviour across all admin entities, with a clear
+- [x] T076 [US3] Deactivate-instead-of-delete behaviour across all admin entities, with a clear
       message when a record is referenced by an order (FR-061)
-- [ ] T077 [US3] `tests/integration/admin-authz.test.ts` — a customer and a staff member each
+- [x] T077 [US3] `tests/integration/admin-authz.test.ts` — a customer and a staff member each
       denied on admin-only routes and on `product_costs`
 
 **Checkpoint**: Staff run the catalog end to end without a developer.
@@ -281,26 +281,26 @@ customer cancels while submitted but is refused once confirmed.
 
 ### Staff (US4)
 
-- [ ] T078 [US4] `src/lib/actions/orders.ts` → `transitionOrder` calling `set_order_status`,
+- [x] T078 [US4] `src/lib/actions/orders.ts` → `transitionOrder` calling `set_order_status`,
       mapping typed errors to localized messages
-- [ ] T079 [US4] `src/app/[locale]/admin/orders/page.tsx` — queue with filters by state, governorate
+- [x] T079 [US4] `src/app/[locale]/admin/orders/page.tsx` — queue with filters by state, governorate
       and date, and search by reference or customer phone (FR-058)
-- [ ] T080 [US4] `src/app/[locale]/admin/orders/[id]/page.tsx` — detail with lines, the delivery
+- [x] T080 [US4] `src/app/[locale]/admin/orders/[id]/page.tsx` — detail with lines, the delivery
       address **including landmark**, transition controls offering only legal next states, and a
       note field (FR-049)
-- [ ] T081 [P] [US4] `src/components/orders/StatusTimeline.tsx` — history with actor, note and
+- [x] T081 [P] [US4] `src/components/orders/StatusTimeline.tsx` — history with actor, note and
       timestamp, rendering in both directions
-- [ ] T082 [US4] `src/app/[locale]/admin/page.tsx` — dashboard with order counts by state
+- [x] T082 [US4] `src/app/[locale]/admin/page.tsx` — dashboard with order counts by state
 
 ### Customer (US5)
 
-- [ ] T083 [P] [US5] `src/app/[locale]/orders/page.tsx` — own order history, newest first
+- [x] T083 [P] [US5] `src/app/[locale]/orders/page.tsx` — own order history, newest first
       (FR-062)
-- [ ] T084 [US5] `src/app/[locale]/orders/[reference]/page.tsx` — detail with the status
+- [x] T084 [US5] `src/app/[locale]/orders/[reference]/page.tsx` — detail with the status
       timeline, and a cancel control shown only while `submitted` (FR-048)
-- [ ] T085 [US5] `cancelMyOrder` action, plus handling for the case where staff confirmed
+- [x] T085 [US5] `cancelMyOrder` action, plus handling for the case where staff confirmed
       first — "this order has already moved on" (FR-050)
-- [ ] T086 [US5] `tests/integration/order-lifecycle.test.ts` — full lifecycle, customer cancel
+- [x] T086 [US5] `tests/integration/order-lifecycle.test.ts` — full lifecycle, customer cancel
       allowed then refused, cross-customer access denied (SC-010, SC-011)
 
 **Checkpoint**: The operation runs end to end with an audit trail that no one can edit.
@@ -321,66 +321,66 @@ downloaded file opens in Excel with Arabic rendering correctly.
 
 ### Data layer
 
-- [ ] T087 Migration `0012_reporting.sql` part 1: add `orders.delivered_at` and
+- [x] T087 Migration `0012_reporting.sql` part 1: add `orders.delivered_at` and
       `orders.cancelled_at`, set inside `set_order_status` in the same transaction as the history
       row so they cannot drift from the status (FR-072)
-- [ ] T088 Migration `0012` part 2: the reporting indexes on `orders(delivered_at)`,
+- [x] T088 Migration `0012` part 2: the reporting indexes on `orders(delivered_at)`,
       `orders(placed_at)`, `orders(governorate_id, placed_at)` and `order_items(product_id)` (SC-019)
-- [ ] T089 Migration `0012` part 3: `cairo_date(ts)` — the single shared Egypt-local bucketing
+- [x] T089 Migration `0012` part 3: `cairo_date(ts)` — the single shared Egypt-local bucketing
       expression every report uses (FR-073, research R18)
-- [ ] T090 [P] Migration `0012` part 4: `report_summary`, `report_sales_by_day`,
+- [x] T090 [P] Migration `0012` part 4: `report_summary`, `report_sales_by_day`,
       `report_sales_by_product`, `report_sales_by_category`, `report_sales_by_governorate` (FR-071,
       FR-074)
-- [ ] T091 [P] Migration `0012` part 5: `report_customers`, `report_promotions`,
+- [x] T091 [P] Migration `0012` part 5: `report_customers`, `report_promotions`,
       `report_low_stock` (FR-075, FR-076, FR-077)
-- [ ] T092 Migration `0012` part 6: the **admin-only** `report_product_margin` and
+- [x] T092 Migration `0012` part 6: the **admin-only** `report_product_margin` and
       `report_profit_by_day`, each guarding with `is_admin()` and **raising** rather than
       returning empty (FR-078, research R20)
-- [ ] T093 Migration `0012` part 7: the `report_exports` audit table with RLS — admin read,
+- [x] T093 Migration `0012` part 7: the `report_exports` audit table with RLS — admin read,
       inserts from `SECURITY DEFINER` only, no updates or deletes (FR-085)
 
 ### Dashboard and reports
 
-- [ ] T094 [US7] `src/app/[locale]/admin/page.tsx` — dashboard: summary tiles, sales trend,
+- [x] T094 [US7] `src/app/[locale]/admin/page.tsx` — dashboard: summary tiles, sales trend,
       top products, low stock, shared date-range control (FR-070)
-- [ ] T095 [P] [US7] `src/components/admin/DateRangePicker.tsx` with Cairo-local presets —
+- [x] T095 [P] [US7] `src/components/admin/DateRangePicker.tsx` with Cairo-local presets —
       today, this week, this month, last month, custom (FR-073)
-- [ ] T096 [P] [US7] `src/components/admin/StatTile.tsx` and `SalesChart.tsx` — legible in both
+- [x] T096 [P] [US7] `src/components/admin/StatTile.tsx` and `SalesChart.tsx` — legible in both
       directions and at 360px
-- [ ] T097 [US7] `src/app/[locale]/admin/reports/sales/page.tsx` — by day, product, category
+- [x] T097 [US7] `src/app/[locale]/admin/reports/sales/page.tsx` — by day, product, category
       and governorate (FR-074)
-- [ ] T098 [P] [US7] `src/app/[locale]/admin/reports/customers/page.tsx` — new, returning, top
+- [x] T098 [P] [US7] `src/app/[locale]/admin/reports/customers/page.tsx` — new, returning, top
       customers (FR-075)
-- [ ] T099 [P] [US7] `src/app/[locale]/admin/reports/promotions/page.tsx` — promotion
+- [x] T099 [P] [US7] `src/app/[locale]/admin/reports/promotions/page.tsx` — promotion
       performance from the promotion recorded at placement (FR-076)
-- [ ] T100 [P] [US7] `src/app/[locale]/admin/reports/inventory/page.tsx` — low stock, with
+- [x] T100 [P] [US7] `src/app/[locale]/admin/reports/inventory/page.tsx` — low stock, with
       stock valuation admin-only (FR-077)
-- [ ] T101 [US7] `src/app/[locale]/admin/reports/profit/page.tsx` — **admin only**, absent from
+- [x] T101 [US7] `src/app/[locale]/admin/reports/profit/page.tsx` — **admin only**, absent from
       the staff navigation, stating on its face that margin uses current cost (FR-078)
 
 ### Export
 
-- [ ] T102 [US7] `src/lib/reports/csv.ts` — RFC 4180 writer emitting **UTF-8 with a BOM**, with
+- [x] T102 [US7] `src/lib/reports/csv.ts` — RFC 4180 writer emitting **UTF-8 with a BOM**, with
       the formula-injection guard on values starting `=`, `+`, `-`, `@`, and piastres rendered as
       decimal EGP (FR-079, FR-080, research R19)
-- [ ] T103 [US7] `src/app/api/reports/[key]/export/route.ts` — role check, calls the same
+- [x] T103 [US7] `src/app/api/reports/[key]/export/route.ts` — role check, calls the same
       function the screen calls, empty-range marker, `report_exports` audit row, streamed
       attachment (FR-081, FR-083, FR-085)
-- [ ] T104 [US7] `src/lib/reports/xlsx.ts` — browser-side workbook generation via dynamic import
+- [x] T104 [US7] `src/lib/reports/xlsx.ts` — browser-side workbook generation via dynamic import
       on the reports route only, with real number formats and RTL sheet direction; never imported
       by a storefront route (FR-079, research R19)
-- [ ] T105 [P] [US7] Localized report labels and bilingual export headers in `ar.json` / `en.json`
+- [x] T105 [P] [US7] Localized report labels and bilingual export headers in `ar.json` / `en.json`
 
 ### Tests ⚠️
 
-- [ ] T106 [P] [US7] `supabase/tests/reporting.test.sql` — figures reconcile exactly against
+- [x] T106 [P] [US7] `supabase/tests/reporting.test.sql` — figures reconcile exactly against
       the underlying orders; cancelled and returned excluded from revenue; an order delivered at
       00:10 and one at 23:50 Cairo land on the correct days; a range spanning a summer-time
       transition stays correct (SC-017, FR-072, FR-073)
-- [ ] T107 [P] [US7] `supabase/tests/reporting-authz.test.sql` — staff calling
+- [x] T107 [P] [US7] `supabase/tests/reporting-authz.test.sql` — staff calling
       `report_product_margin` raises `not_authorized`; no staff-visible function has a cost,
       margin or profit column in its return type (SC-018)
-- [ ] T108 [US7] `tests/integration/report-export.test.ts` — export matches the screen for the
+- [x] T108 [US7] `tests/integration/report-export.test.ts` — export matches the screen for the
       same range; CSV begins `EF BB BF` and Arabic survives a round trip; a product named
       `=SUM(A1:A9)` is written escaped; an empty range returns the marker; 5,000 rows complete
       (FR-081, FR-084, SC-020)
@@ -396,24 +396,24 @@ under a minute, and hand the accountant a spreadsheet.
 
 ### Search and offers (US6)
 
-- [ ] T109 [P] [US6] `src/components/catalog/SearchBox.tsx` with debounced input
-- [ ] T110 [US6] `src/app/[locale]/search/page.tsx` — trigram search over the normalized column,
+- [x] T109 [P] [US6] `src/components/catalog/SearchBox.tsx` with debounced input
+- [x] T110 [US6] `src/app/[locale]/search/page.tsx` — trigram search over the normalized column,
       with an empty-state offering a route back to category browsing (FR-019)
-- [ ] T111 [P] [US6] `src/app/[locale]/offers/page.tsx` — all currently discounted products
+- [x] T111 [P] [US6] `src/app/[locale]/offers/page.tsx` — all currently discounted products
       (FR-020)
 - [ ] T112 [US6] Incremental loading for listings that preserves scroll position (FR-023)
-- [ ] T113 [US6] `tests/integration/search.test.ts` — the same product found by its Arabic and
+- [x] T113 [US6] `tests/integration/search.test.ts` — the same product found by its Arabic and
       English names, and found despite diacritics and alef/ta-marbuta variants (SC-004)
 
 ### Operations
 
-- [ ] T114 [P] `src/app/api/cron/keepalive/route.ts` plus the 6-hourly `wrangler.jsonc` trigger,
+- [x] T114 [P] `src/app/api/cron/keepalive/route.ts` plus the 6-hourly `wrangler.jsonc` trigger,
       preventing free-tier pausing (FR-069)
-- [ ] T115 [P] Daily `login_attempts` sweep, bounding the table
-- [ ] T116 [P] Weekly orphan-image sweep reclaiming unreferenced storage objects
-- [ ] T117 **Weekly data export job** — the free tier has no backups, so this is the only
+- [x] T115 [P] Daily `login_attempts` sweep, bounding the table
+- [x] T116 [P] Weekly orphan-image sweep reclaiming unreferenced storage objects
+- [x] T117 **Weekly data export job** — the free tier has no backups, so this is the only
       recovery point (research R13; flagged as a risk in [plan.md](plan.md#risks-and-mitigations))
-- [ ] T118 [P] Storage-usage monitoring with a warning at 700 MB of the 1 GB ceiling
+- [x] T118 [P] Storage-usage monitoring with a warning at 700 MB of the 1 GB ceiling
 
 ### Performance and polish
 
@@ -425,8 +425,29 @@ under a minute, and hand the accountant a spreadsheet.
       overflow (SC-012)
 - [ ] T123 [P] Localized error and empty states across all flows, both languages
 - [ ] T124 [P] Accessibility pass — focus order under RTL, labels, and contrast
-- [ ] T125 Verify `SUPABASE_SERVICE_ROLE_KEY` is absent from the built client bundle (FR-066)
-- [ ] T126 Complete the post-deploy checklist in [quickstart.md](quickstart.md#post-deploy-checklist)
+- [x] T125 Verify `SUPABASE_SERVICE_ROLE_KEY` is absent from the built client bundle (FR-066)
+- [x] T126 Write the post-deploy checklist in [quickstart.md](quickstart.md#post-deploy-checklist).
+      Walking it is a launch step rather than a build step — it runs against the deployed
+      site, and each item names the guarantee it is checking.
+
+### Release pipeline
+
+Added while making the project actually deployable. Not in the original plan, which
+assumed deploying by hand.
+
+- [x] T127 `.github/workflows/deploy.yml` — verify, migrate, build, deploy, smoke-test,
+      triggered by a merge to `main`
+- [x] T128 Move the 27 governorates from `seed.sql` into migration 0018. `supabase db push`
+      never applies the seed, so a hosted project came up with an empty `governorates`
+      table: no governorate to pick at checkout, and an empty delivery-pricing screen to
+      fix it from
+- [x] T129 `scripts/bootstrap-admin.ts` — creates the first admin's `auth.users` **and**
+      `public.profiles` rows. A user created through the Supabase dashboard has no
+      profile, so `is_admin()` is false and every policy refuses a login that appears to
+      have worked
+- [x] T130 `scripts/test-deploy-path.sh` — builds a database from migrations alone, the way
+      a deploy does, and asserts it is usable on day one. This is the test that would have
+      caught T128
 
 **Checkpoint**: Ready for production traffic.
 

@@ -44,9 +44,22 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-placeholder-anon-key
           NEXT_PUBLIC_SITE_URL: http://localhost:3000
+          # A distinctive value, so the bundle check below is searching for
+          # something that could only have come from this build.
+          SUPABASE_SERVICE_ROLE_KEY: ci-placeholder-service-role-key-do-not-ship
+          CRON_SECRET: ci-placeholder-cron-secret-value
+
+      # FR-066. The service-role key bypasses every RLS policy; if it ever
+      # reached a browser bundle, every isolation guarantee would be void. Three
+      # separate mechanisms are meant to prevent that — this proves they worked.
+      - name: No secrets in the client bundle
+        run: ./scripts/check-client-bundle.sh
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
+          SUPABASE_SERVICE_ROLE_KEY: ci-placeholder-service-role-key-do-not-ship
 
   database:
-    name: Database — pricing, orders, transitions, RLS
+    name: Database — pricing, orders, RLS, admin, lifecycle, reporting, search
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -81,6 +94,14 @@ jobs:
       # an already-populated database is a broken migration.
       - name: SQL suites
         run: ./scripts/run-sql-tests.sh
+
+      # What a deploy actually produces. Every suite above applies the seed as
+      # well as the migrations, which is `supabase db reset` — but deploying
+      # runs `supabase db push`, and that never applies the seed. This builds
+      # the database the way production is built and checks it is usable on day
+      # one: reference data present, no sample data, no default credentials.
+      - name: Deploy path — migrations without the seed
+        run: ./scripts/test-deploy-path.sh
 
       # SC-016: two simultaneous orders for the last unit of stock.
       - name: Concurrency
