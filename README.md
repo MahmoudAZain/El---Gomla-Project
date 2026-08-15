@@ -13,16 +13,23 @@ delivery pricing without a developer, the order lifecycle from submitted to deli
 full audit trail, reporting that reconciles to the piastre and exports to CSV or Excel, and
 bilingual search plus the scheduled jobs the free tier requires.
 
-Remaining before production traffic: the review passes that need a deployed environment —
-incremental listing loading (T112), the image and bundle audits (T119–T120), a throttled
-Lighthouse run (T121), the 360px RTL/LTR visual sweep (T122), localized error states (T123),
-the accessibility pass (T124), and the post-deploy checklist (T126).
+**Deployable.** Merging to `main` runs [the deploy workflow](.github/workflows/deploy.yml):
+it verifies the commit, applies migrations to Supabase, builds the Workers bundle, publishes
+it and smoke-tests the result. Setting that up is a one-time pass through
+[the deployment guide](specs/001-egyptian-grocery-ecommerce/quickstart.md#deployment) — nine
+repository secrets, one variable, and one command to create the first admin account.
+
+Remaining, none of it blocking a launch: incremental listing loading (T112 — listings
+paginate today), the image and bundle audits (T119–T120), a throttled Lighthouse run (T121),
+the 360px RTL/LTR visual sweep (T122), localized error states (T123) and the accessibility
+pass (T124). Each needs a deployed environment or a human eye.
 
 ```bash
 npm install && npm run dev              # http://localhost:3000 → /ar
 npm run cf:build && npx wrangler dev    # the real Workers bundle
 supabase start && supabase db reset     # schema + seed
 ./scripts/run-sql-tests.sh              # pricing, orders, RLS, admin, lifecycle, reporting, search
+./scripts/test-deploy-path.sh           # what `supabase db push` alone produces
 ./scripts/test-concurrency.sh           # two orders race for the last unit
 ./scripts/check-client-bundle.sh        # no service-role key in the browser
 ```

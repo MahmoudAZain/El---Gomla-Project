@@ -426,7 +426,28 @@ under a minute, and hand the accountant a spreadsheet.
 - [ ] T123 [P] Localized error and empty states across all flows, both languages
 - [ ] T124 [P] Accessibility pass — focus order under RTL, labels, and contrast
 - [x] T125 Verify `SUPABASE_SERVICE_ROLE_KEY` is absent from the built client bundle (FR-066)
-- [ ] T126 Complete the post-deploy checklist in [quickstart.md](quickstart.md#post-deploy-checklist)
+- [x] T126 Write the post-deploy checklist in [quickstart.md](quickstart.md#post-deploy-checklist).
+      Walking it is a launch step rather than a build step — it runs against the deployed
+      site, and each item names the guarantee it is checking.
+
+### Release pipeline
+
+Added while making the project actually deployable. Not in the original plan, which
+assumed deploying by hand.
+
+- [x] T127 `.github/workflows/deploy.yml` — verify, migrate, build, deploy, smoke-test,
+      triggered by a merge to `main`
+- [x] T128 Move the 27 governorates from `seed.sql` into migration 0018. `supabase db push`
+      never applies the seed, so a hosted project came up with an empty `governorates`
+      table: no governorate to pick at checkout, and an empty delivery-pricing screen to
+      fix it from
+- [x] T129 `scripts/bootstrap-admin.ts` — creates the first admin's `auth.users` **and**
+      `public.profiles` rows. A user created through the Supabase dashboard has no
+      profile, so `is_admin()` is false and every policy refuses a login that appears to
+      have worked
+- [x] T130 `scripts/test-deploy-path.sh` — builds a database from migrations alone, the way
+      a deploy does, and asserts it is usable on day one. This is the test that would have
+      caught T128
 
 **Checkpoint**: Ready for production traffic.
 

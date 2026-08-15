@@ -95,6 +95,14 @@ jobs:
       - name: SQL suites
         run: ./scripts/run-sql-tests.sh
 
+      # What a deploy actually produces. Every suite above applies the seed as
+      # well as the migrations, which is `supabase db reset` — but deploying
+      # runs `supabase db push`, and that never applies the seed. This builds
+      # the database the way production is built and checks it is usable on day
+      # one: reference data present, no sample data, no default credentials.
+      - name: Deploy path — migrations without the seed
+        run: ./scripts/test-deploy-path.sh
+
       # SC-016: two simultaneous orders for the last unit of stock.
       - name: Concurrency
         run: ./scripts/test-concurrency.sh

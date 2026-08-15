@@ -1,0 +1,144 @@
+name: Deploy
+
+# Publishing the shop.
+#
+# Two things have to move together, in this order: the database schema, then the
+# Worker. Reversing them ships code that queries columns the database does not
+# have yet, and the first customer sees the error.
+#
+# Triggered by a push to main — so merging a pull request publishes — and
+# manually, for re-deploying without a code change.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# One deploy at a time. Two overlapping runs could apply migrations out of
+# order, and `cancel-in-progress` is wrong here: a half-finished `db push` is
+# worse than a queued one.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Never publish something the checks have not passed. The CI workflow runs on
+  # the pull request; this re-runs the fast gates on the merge commit itself,
+  # because that combination is what is actually being deployed.
+  # ---------------------------------------------------------------------------
+  verify:
+    name: Verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run test
+
+  migrate:
+    name: Apply migrations
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: verify
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      # `db push` applies only migrations that have not run yet, so re-running a
+      # deploy with no new migration is a no-op rather than a re-application.
+      #
+      # It does NOT apply supabase/seed.sql — which is why reference data such
+      # as the 27 governorates lives in a migration (0018) and only sample data
+      # stays in the seed. scripts/test-deploy-path.sh guards that split.
+      - name: Push migrations to the hosted project
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          supabase link --project-ref "${{ secrets.SUPABASE_PROJECT_REF }}"
+          supabase db push
+
+  deploy:
+    name: Deploy to Cloudflare Workers
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: migrate
+    environment: production
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+
+      # NEXT_PUBLIC_* values are inlined into the bundle by Next at build time,
+      # not read at runtime — so they have to be present *here*. Setting them as
+      # Worker variables afterwards would be too late and would silently do
+      # nothing.
+      #
+      # They are not secrets: the anon key is designed to be public, and Row
+      # Level Security is the boundary (Principle II). They live in GitHub as
+      # secrets only to keep the project reference out of public build logs.
+      - name: Build the Workers bundle
+        run: npm run cf:build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
+
+      # FR-066, on the artifact that is about to be published rather than on a
+      # CI build of the same commit. The service-role key bypasses every RLS
+      # policy; this is the last point at which shipping it is still preventable.
+      - name: No secrets in the client bundle
+        run: ./scripts/check-client-bundle.sh
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+
+      # `secrets:` uploads each named value as a Worker secret before deploying,
+      # so GitHub stays the single place they are set and a rotated key reaches
+      # production by re-running this workflow.
+      #
+      # NEXT_PUBLIC_SITE_URL is passed as a var as well as being built in: the
+      # scheduled handler in worker/index.ts reads it from the Worker
+      # environment to build the URLs it calls the cron routes with.
+      - name: Deploy
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy --var NEXT_PUBLIC_SITE_URL:${{ vars.NEXT_PUBLIC_SITE_URL }}
+          secrets: |
+            SUPABASE_SERVICE_ROLE_KEY
+            CRON_SECRET
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+
+      # A deploy that returns 200 on the home page is the minimum claim worth
+      # making. Anything subtler belongs in the post-deploy checklist, which a
+      # person walks through.
+      - name: Smoke-test the deployed site
+        run: |
+          URL="${{ vars.NEXT_PUBLIC_SITE_URL }}"
+          echo "Waiting for ${URL}/ar to answer..."
+          for attempt in 1 2 3 4 5; do
+            code=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 20 "${URL}/ar" || echo 000)
+            echo "  attempt ${attempt}: HTTP ${code}"
+            [ "$code" = "200" ] && exit 0
+            sleep 10
+          done
+          echo "::error::${URL}/ar did not return 200 after the deploy"
+          exit 1

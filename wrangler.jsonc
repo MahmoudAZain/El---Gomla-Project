@@ -35,11 +35,27 @@
     ]
   },
 
+  // The fallback for `wrangler dev`. A real deploy overrides it — the Deploy
+  // workflow passes `--var NEXT_PUBLIC_SITE_URL:...` from the repository
+  // variable of the same name, so the production origin is configured in GitHub
+  // rather than committed here.
+  //
+  // The scheduled handler in worker/index.ts reads this at runtime to build the
+  // URLs it calls the cron routes with. If it were left pointing at localhost
+  // in production, all four jobs would fail — including the keep-alive whose
+  // failure takes the shop offline after a quiet week.
   "vars": {
     "NEXT_PUBLIC_SITE_URL": "http://localhost:3000"
   }
 
-  // Secrets are set with `wrangler secret put`, never committed:
+  // Secrets are never committed. The Deploy workflow uploads them from GitHub
+  // secrets on every run; set them by hand with `wrangler secret put` only when
+  // deploying from a laptop:
   //   SUPABASE_SERVICE_ROLE_KEY  — bypasses RLS; server-only (FR-066)
   //   CRON_SECRET                — shared secret for the scheduled endpoints
+  //
+  // NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY are deliberately
+  // absent: Next inlines NEXT_PUBLIC_* at build time, so they must be in the
+  // build environment. Setting them here would have no effect and would suggest
+  // otherwise.
 }

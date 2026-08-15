@@ -19,6 +19,10 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
+    // Operational scripts run under `node --experimental-strip-types`, which
+    // performs no extension resolution — a relative import there must name the
+    // .ts file. Permitted only because `noEmit` is on; nothing is compiled.
+    "allowImportingTsExtensions": true,
     "jsx": "preserve",
     "incremental": true,
     "verbatimModuleSyntax": true,
