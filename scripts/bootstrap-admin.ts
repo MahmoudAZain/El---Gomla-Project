@@ -55,6 +55,40 @@ const password = process.env.ADMIN_PASSWORD;
 if (!url) die('NEXT_PUBLIC_SUPABASE_URL is not set.');
 if (!serviceKey) die('SUPABASE_SERVICE_ROLE_KEY is not set. Find it in Supabase → Settings → API.');
 
+// ---------------------------------------------------------------------------
+// The URL has to be the bare project origin, and getting that wrong fails in a
+// way that reads like a bug in this script rather than a wrong setting.
+//
+// The Supabase dashboard shows several addresses. The one on the Data API page
+// is the REST endpoint and ends `/rest/v1`; the one this needs is the Project
+// URL, `https://<ref>.supabase.co`, with nothing after `.co`. Hand the client a
+// URL with a path and it builds `…/rest/v1/auth/v1/admin/users`, which the
+// gateway rejects as "Invalid path specified in request URL" — true, and no
+// help at all in working out which of ten settings is at fault.
+//
+// Checked here rather than trusted, because the value is a masked secret in CI
+// logs: nobody can simply look at it to see what is wrong.
+// ---------------------------------------------------------------------------
+const parsedUrl = URL.parse(url);
+if (!parsedUrl) die(`NEXT_PUBLIC_SUPABASE_URL is not a valid URL: "${url}"`);
+
+if (parsedUrl.pathname !== '/' && parsedUrl.pathname !== '') {
+  die(
+    `NEXT_PUBLIC_SUPABASE_URL has a path on the end ("${parsedUrl.pathname}").\n` +
+      `  It must be just the project origin: ${parsedUrl.origin}\n\n` +
+      '  You have probably copied the API URL from the Data API page. The value\n' +
+      '  needed is the Project URL, under Project Settings → API — nothing after\n' +
+      '  ".supabase.co".\n\n' +
+      '  Fix the NEXT_PUBLIC_SUPABASE_URL secret, then re-run BOTH the Deploy\n' +
+      '  workflow and this one: Next bakes that value into the site at build\n' +
+      '  time, so the running shop is reading the same wrong address.',
+  );
+}
+
+// A trailing slash survives `new URL()` as pathname "/" and is harmless once
+// normalized away, which `origin` does.
+const supabaseUrl = parsedUrl.origin;
+
 const rawPhone = arg('phone');
 const fullName = arg('name');
 
@@ -72,11 +106,11 @@ if (!password || password.length < 8) {
 }
 
 const email = phoneToAuthIdentifier(phone);
-const service = createClient(url, serviceKey, {
+const service = createClient(supabaseUrl, serviceKey, {
   auth: { autoRefreshToken: false, persistSession: false },
 });
 
-console.log(`\nBootstrapping admin on ${url}`);
+console.log(`\nBootstrapping admin on ${supabaseUrl}`);
 console.log(`  phone    ${phone}`);
 console.log(`  identity ${email}`);
 
