@@ -119,6 +119,43 @@ export async function getProductsInCategory(
   return { products: (data ?? []) as ListedProduct[], total: count ?? 0 };
 }
 
+/**
+ * Bilingual search (FR-019).
+ *
+ * One round trip: `search_product_listing` returns the same shape a category
+ * grid renders, so a result carries its price, discount and photo without a
+ * follow-up query per product (migration 0016).
+ *
+ * Matching is trigram over a normalized column rather than full-text, because
+ * Postgres ships no Arabic dictionary and `simple` matches whole tokens only —
+ * which fails on the partial words shoppers actually type. Normalization folds
+ * alef and ta-marbuta variants and strips diacritics on both sides of the
+ * comparison, so مياه and مياة find each other (research R10).
+ */
+export async function searchProducts(
+  query: string,
+  { page = 1, perPage = 24 }: { page?: number; perPage?: number } = {},
+): Promise<{ products: ListedProduct[]; total: number }> {
+  const trimmed = query.trim();
+  if (trimmed.length < 2) return { products: [], total: 0 };
+
+  const supabase = await createClient();
+
+  const [results, count] = await Promise.all([
+    supabase.rpc('search_product_listing', {
+      p_query: trimmed,
+      p_limit: perPage,
+      p_offset: (page - 1) * perPage,
+    }),
+    supabase.rpc('count_search_results', { p_query: trimmed }),
+  ]);
+
+  return {
+    products: (results.data ?? []) as ListedProduct[],
+    total: Number(count.data ?? 0),
+  };
+}
+
 export async function getProductBySlug(slug: string): Promise<ListedProduct | null> {
   const supabase = await createClient();
   const { data } = await supabase

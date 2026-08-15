@@ -396,24 +396,24 @@ under a minute, and hand the accountant a spreadsheet.
 
 ### Search and offers (US6)
 
-- [ ] T109 [P] [US6] `src/components/catalog/SearchBox.tsx` with debounced input
-- [ ] T110 [US6] `src/app/[locale]/search/page.tsx` — trigram search over the normalized column,
+- [x] T109 [P] [US6] `src/components/catalog/SearchBox.tsx` with debounced input
+- [x] T110 [US6] `src/app/[locale]/search/page.tsx` — trigram search over the normalized column,
       with an empty-state offering a route back to category browsing (FR-019)
-- [ ] T111 [P] [US6] `src/app/[locale]/offers/page.tsx` — all currently discounted products
+- [x] T111 [P] [US6] `src/app/[locale]/offers/page.tsx` — all currently discounted products
       (FR-020)
 - [ ] T112 [US6] Incremental loading for listings that preserves scroll position (FR-023)
-- [ ] T113 [US6] `tests/integration/search.test.ts` — the same product found by its Arabic and
+- [x] T113 [US6] `tests/integration/search.test.ts` — the same product found by its Arabic and
       English names, and found despite diacritics and alef/ta-marbuta variants (SC-004)
 
 ### Operations
 
-- [ ] T114 [P] `src/app/api/cron/keepalive/route.ts` plus the 6-hourly `wrangler.jsonc` trigger,
+- [x] T114 [P] `src/app/api/cron/keepalive/route.ts` plus the 6-hourly `wrangler.jsonc` trigger,
       preventing free-tier pausing (FR-069)
-- [ ] T115 [P] Daily `login_attempts` sweep, bounding the table
-- [ ] T116 [P] Weekly orphan-image sweep reclaiming unreferenced storage objects
-- [ ] T117 **Weekly data export job** — the free tier has no backups, so this is the only
+- [x] T115 [P] Daily `login_attempts` sweep, bounding the table
+- [x] T116 [P] Weekly orphan-image sweep reclaiming unreferenced storage objects
+- [x] T117 **Weekly data export job** — the free tier has no backups, so this is the only
       recovery point (research R13; flagged as a risk in [plan.md](plan.md#risks-and-mitigations))
-- [ ] T118 [P] Storage-usage monitoring with a warning at 700 MB of the 1 GB ceiling
+- [x] T118 [P] Storage-usage monitoring with a warning at 700 MB of the 1 GB ceiling
 
 ### Performance and polish
 
@@ -425,7 +425,7 @@ under a minute, and hand the accountant a spreadsheet.
       overflow (SC-012)
 - [ ] T123 [P] Localized error and empty states across all flows, both languages
 - [ ] T124 [P] Accessibility pass — focus order under RTL, labels, and contrast
-- [ ] T125 Verify `SUPABASE_SERVICE_ROLE_KEY` is absent from the built client bundle (FR-066)
+- [x] T125 Verify `SUPABASE_SERVICE_ROLE_KEY` is absent from the built client bundle (FR-066)
 - [ ] T126 Complete the post-deploy checklist in [quickstart.md](quickstart.md#post-deploy-checklist)
 
 **Checkpoint**: Ready for production traffic.

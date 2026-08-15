@@ -530,5 +530,18 @@
     "downloadCsv": "تحميل CSV",
     "downloadExcel": "تحميل Excel",
     "preparing": "جارٍ التجهيز…"
+  },
+  "search": {
+    "title": "البحث",
+    "label": "ابحث عن منتج",
+    "placeholder": "دوّر على منتج أو ماركة",
+    "go": "بحث",
+    "prompt": "اكتب حرفين على الأقل عشان تدوّر.",
+    "noResults": "مالقيناش حاجة بـ«{query}».",
+    "browseInstead": "تصفّح المتجر بدل كده",
+    "resultCount": "{count} نتيجة لـ«{query}»"
+  },
+  "offers": {
+    "none": "مافيش عروض شغالة دلوقتي. تعالى بص تاني قريب."
   }
 }

@@ -6,19 +6,25 @@ A bilingual (Arabic-default, RTL) grocery storefront and staff admin console for
 market. Cash on delivery only, fulfilled by an in-house fleet. The site's job is to capture
 correct orders cheaply and safely.
 
-**Status**: Stages 1–6 complete — Next.js on Cloudflare Workers with a bilingual Arabic-first
-RTL shell, the full data layer with 202 passing SQL assertions, the storefront through to a
-placed order, a staff console that runs the catalog, promotions and delivery pricing without a
-developer, the order lifecycle from submitted to delivered with a full audit trail, and
-reporting that reconciles to the piastre and exports to CSV or Excel. Stage 7 (search, offers
-and hardening) is next.
+**Status**: Stages 1–6 complete and stage 7 substantially done — Next.js on Cloudflare Workers
+with a bilingual Arabic-first RTL shell, the full data layer with 222 passing SQL assertions,
+the storefront through to a placed order, a staff console that runs the catalog, promotions and
+delivery pricing without a developer, the order lifecycle from submitted to delivered with a
+full audit trail, reporting that reconciles to the piastre and exports to CSV or Excel, and
+bilingual search plus the scheduled jobs the free tier requires.
+
+Remaining before production traffic: the review passes that need a deployed environment —
+incremental listing loading (T112), the image and bundle audits (T119–T120), a throttled
+Lighthouse run (T121), the 360px RTL/LTR visual sweep (T122), localized error states (T123),
+the accessibility pass (T124), and the post-deploy checklist (T126).
 
 ```bash
 npm install && npm run dev              # http://localhost:3000 → /ar
 npm run cf:build && npx wrangler dev    # the real Workers bundle
 supabase start && supabase db reset     # schema + seed
-./scripts/run-sql-tests.sh              # pricing, orders, RLS, admin, lifecycle, reporting
+./scripts/run-sql-tests.sh              # pricing, orders, RLS, admin, lifecycle, reporting, search
 ./scripts/test-concurrency.sh           # two orders race for the last unit
+./scripts/check-client-bundle.sh        # no service-role key in the browser
 ```
 
 ## Stack
@@ -108,6 +114,12 @@ until orders run their full lifecycle.
 The Supabase free tier provides **no backups**, and the business has chosen to launch on it. The
 weekly export job (T117) is therefore the only recovery point, and is required rather than
 optional. Point-in-time recovery would need the $25/month Pro tier.
+
+It runs every Sunday at 05:00 UTC and writes newline-delimited JSON to the private `backups`
+bucket, in an order that replays cleanly against foreign keys. One limitation is worth knowing
+now rather than on the day it matters: **passwords are not in it and cannot be**. They live in
+`auth.users` as hashes the API does not expose, so a restore recreates accounts without
+credentials — which is what the staff-mediated reset exists for.
 
 ## Continuing the work
 

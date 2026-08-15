@@ -1,7 +1,12 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "el-gomala",
-  "main": ".open-next/worker.js",
+
+  // Not `.open-next/worker.js` directly. The generated worker exports `fetch`
+  // and nothing else, so a Cron Trigger would fire into a `scheduled` handler
+  // that does not exist — silently, while the keep-alive never ran. `worker/`
+  // adds that handler and delegates every request unchanged.
+  "main": "worker/index.ts",
   "compatibility_date": "2026-08-13",
 
   // Required by @opennextjs/cloudflare: the adapter runs Next.js on the Node.js

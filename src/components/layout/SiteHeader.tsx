@@ -18,6 +18,21 @@ export async function SiteHeader() {
 
         <nav className="flex items-center gap-1" aria-label={t('home')}>
           <Link
+            href="/offers"
+            className="hidden min-h-touch items-center rounded px-3 text-sm font-semibold text-ink-2 hover:text-brand sm:flex"
+          >
+            {t('offers')}
+          </Link>
+
+          <Link
+            href="/search"
+            className="flex min-h-touch items-center gap-1.5 rounded px-3 text-sm font-semibold text-ink-2 hover:text-brand"
+          >
+            <span aria-hidden="true">🔍</span>
+            <span className="hidden sm:inline">{t('search')}</span>
+          </Link>
+
+          <Link
             href="/cart"
             className="flex min-h-touch items-center gap-1.5 rounded px-3 text-sm font-semibold text-ink-2 hover:text-brand"
           >

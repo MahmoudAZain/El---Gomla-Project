@@ -530,5 +530,18 @@
     "downloadCsv": "Download CSV",
     "downloadExcel": "Download Excel",
     "preparing": "Preparing…"
+  },
+  "search": {
+    "title": "Search",
+    "label": "Search products",
+    "placeholder": "Search for a product or brand",
+    "go": "Search",
+    "prompt": "Type at least two letters to search.",
+    "noResults": "Nothing matched “{query}”.",
+    "browseInstead": "Browse the shop instead",
+    "resultCount": "{count} results for “{query}”"
+  },
+  "offers": {
+    "none": "There are no offers running right now. Check back soon."
   }
 }
