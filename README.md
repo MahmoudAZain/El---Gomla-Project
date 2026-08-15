@@ -6,17 +6,18 @@ A bilingual (Arabic-default, RTL) grocery storefront and staff admin console for
 market. Cash on delivery only, fulfilled by an in-house fleet. The site's job is to capture
 correct orders cheaply and safely.
 
-**Status**: Stages 1–5 complete — Next.js on Cloudflare Workers with a bilingual Arabic-first
-RTL shell, the full data layer with 155 passing SQL assertions, the storefront through to a
+**Status**: Stages 1–6 complete — Next.js on Cloudflare Workers with a bilingual Arabic-first
+RTL shell, the full data layer with 202 passing SQL assertions, the storefront through to a
 placed order, a staff console that runs the catalog, promotions and delivery pricing without a
-developer, and the order lifecycle from submitted to delivered with a full audit trail.
-Stage 6 (reporting) is next.
+developer, the order lifecycle from submitted to delivered with a full audit trail, and
+reporting that reconciles to the piastre and exports to CSV or Excel. Stage 7 (search, offers
+and hardening) is next.
 
 ```bash
 npm install && npm run dev              # http://localhost:3000 → /ar
 npm run cf:build && npx wrangler dev    # the real Workers bundle
 supabase start && supabase db reset     # schema + seed
-./scripts/run-sql-tests.sh              # pricing, orders, transitions, RLS, admin, lifecycle
+./scripts/run-sql-tests.sh              # pricing, orders, RLS, admin, lifecycle, reporting
 ./scripts/test-concurrency.sh           # two orders race for the last unit
 ```
 
@@ -85,8 +86,8 @@ Contracts: [RPC functions](specs/001-egyptian-grocery-ecommerce/contracts/rpc-co
 | 3. Storefront ✅ | Register, browse, cart, checkout — **MVP, real orders** |
 | 4. Admin ✅ | Products, categories, brands, promotions, governorates |
 | 5. Order operations ✅ | Staff queue and transitions; customer tracking |
-| 6. Reporting 🎯 | Dashboard, sales/customer/promotion reports, CSV and Excel export |
-| 7. Discovery | Arabic/English search, offers, scheduled jobs, hardening |
+| 6. Reporting ✅ | Dashboard, sales/customer/promotion reports, CSV and Excel export |
+| 7. Discovery 🎯 | Arabic/English search, offers, scheduled jobs, hardening |
 
 Stage 2 precedes all UI because the correctness and isolation guarantees are database-resident.
 Stages 3 and 4 can run in parallel. Stage 6 follows stage 5 because there is nothing to report

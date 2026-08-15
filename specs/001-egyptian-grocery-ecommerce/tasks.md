@@ -321,66 +321,66 @@ downloaded file opens in Excel with Arabic rendering correctly.
 
 ### Data layer
 
-- [ ] T087 Migration `0012_reporting.sql` part 1: add `orders.delivered_at` and
+- [x] T087 Migration `0012_reporting.sql` part 1: add `orders.delivered_at` and
       `orders.cancelled_at`, set inside `set_order_status` in the same transaction as the history
       row so they cannot drift from the status (FR-072)
-- [ ] T088 Migration `0012` part 2: the reporting indexes on `orders(delivered_at)`,
+- [x] T088 Migration `0012` part 2: the reporting indexes on `orders(delivered_at)`,
       `orders(placed_at)`, `orders(governorate_id, placed_at)` and `order_items(product_id)` (SC-019)
-- [ ] T089 Migration `0012` part 3: `cairo_date(ts)` — the single shared Egypt-local bucketing
+- [x] T089 Migration `0012` part 3: `cairo_date(ts)` — the single shared Egypt-local bucketing
       expression every report uses (FR-073, research R18)
-- [ ] T090 [P] Migration `0012` part 4: `report_summary`, `report_sales_by_day`,
+- [x] T090 [P] Migration `0012` part 4: `report_summary`, `report_sales_by_day`,
       `report_sales_by_product`, `report_sales_by_category`, `report_sales_by_governorate` (FR-071,
       FR-074)
-- [ ] T091 [P] Migration `0012` part 5: `report_customers`, `report_promotions`,
+- [x] T091 [P] Migration `0012` part 5: `report_customers`, `report_promotions`,
       `report_low_stock` (FR-075, FR-076, FR-077)
-- [ ] T092 Migration `0012` part 6: the **admin-only** `report_product_margin` and
+- [x] T092 Migration `0012` part 6: the **admin-only** `report_product_margin` and
       `report_profit_by_day`, each guarding with `is_admin()` and **raising** rather than
       returning empty (FR-078, research R20)
-- [ ] T093 Migration `0012` part 7: the `report_exports` audit table with RLS — admin read,
+- [x] T093 Migration `0012` part 7: the `report_exports` audit table with RLS — admin read,
       inserts from `SECURITY DEFINER` only, no updates or deletes (FR-085)
 
 ### Dashboard and reports
 
-- [ ] T094 [US7] `src/app/[locale]/admin/page.tsx` — dashboard: summary tiles, sales trend,
+- [x] T094 [US7] `src/app/[locale]/admin/page.tsx` — dashboard: summary tiles, sales trend,
       top products, low stock, shared date-range control (FR-070)
-- [ ] T095 [P] [US7] `src/components/admin/DateRangePicker.tsx` with Cairo-local presets —
+- [x] T095 [P] [US7] `src/components/admin/DateRangePicker.tsx` with Cairo-local presets —
       today, this week, this month, last month, custom (FR-073)
-- [ ] T096 [P] [US7] `src/components/admin/StatTile.tsx` and `SalesChart.tsx` — legible in both
+- [x] T096 [P] [US7] `src/components/admin/StatTile.tsx` and `SalesChart.tsx` — legible in both
       directions and at 360px
-- [ ] T097 [US7] `src/app/[locale]/admin/reports/sales/page.tsx` — by day, product, category
+- [x] T097 [US7] `src/app/[locale]/admin/reports/sales/page.tsx` — by day, product, category
       and governorate (FR-074)
-- [ ] T098 [P] [US7] `src/app/[locale]/admin/reports/customers/page.tsx` — new, returning, top
+- [x] T098 [P] [US7] `src/app/[locale]/admin/reports/customers/page.tsx` — new, returning, top
       customers (FR-075)
-- [ ] T099 [P] [US7] `src/app/[locale]/admin/reports/promotions/page.tsx` — promotion
+- [x] T099 [P] [US7] `src/app/[locale]/admin/reports/promotions/page.tsx` — promotion
       performance from the promotion recorded at placement (FR-076)
-- [ ] T100 [P] [US7] `src/app/[locale]/admin/reports/inventory/page.tsx` — low stock, with
+- [x] T100 [P] [US7] `src/app/[locale]/admin/reports/inventory/page.tsx` — low stock, with
       stock valuation admin-only (FR-077)
-- [ ] T101 [US7] `src/app/[locale]/admin/reports/profit/page.tsx` — **admin only**, absent from
+- [x] T101 [US7] `src/app/[locale]/admin/reports/profit/page.tsx` — **admin only**, absent from
       the staff navigation, stating on its face that margin uses current cost (FR-078)
 
 ### Export
 
-- [ ] T102 [US7] `src/lib/reports/csv.ts` — RFC 4180 writer emitting **UTF-8 with a BOM**, with
+- [x] T102 [US7] `src/lib/reports/csv.ts` — RFC 4180 writer emitting **UTF-8 with a BOM**, with
       the formula-injection guard on values starting `=`, `+`, `-`, `@`, and piastres rendered as
       decimal EGP (FR-079, FR-080, research R19)
-- [ ] T103 [US7] `src/app/api/reports/[key]/export/route.ts` — role check, calls the same
+- [x] T103 [US7] `src/app/api/reports/[key]/export/route.ts` — role check, calls the same
       function the screen calls, empty-range marker, `report_exports` audit row, streamed
       attachment (FR-081, FR-083, FR-085)
-- [ ] T104 [US7] `src/lib/reports/xlsx.ts` — browser-side workbook generation via dynamic import
+- [x] T104 [US7] `src/lib/reports/xlsx.ts` — browser-side workbook generation via dynamic import
       on the reports route only, with real number formats and RTL sheet direction; never imported
       by a storefront route (FR-079, research R19)
-- [ ] T105 [P] [US7] Localized report labels and bilingual export headers in `ar.json` / `en.json`
+- [x] T105 [P] [US7] Localized report labels and bilingual export headers in `ar.json` / `en.json`
 
 ### Tests ⚠️
 
-- [ ] T106 [P] [US7] `supabase/tests/reporting.test.sql` — figures reconcile exactly against
+- [x] T106 [P] [US7] `supabase/tests/reporting.test.sql` — figures reconcile exactly against
       the underlying orders; cancelled and returned excluded from revenue; an order delivered at
       00:10 and one at 23:50 Cairo land on the correct days; a range spanning a summer-time
       transition stays correct (SC-017, FR-072, FR-073)
-- [ ] T107 [P] [US7] `supabase/tests/reporting-authz.test.sql` — staff calling
+- [x] T107 [P] [US7] `supabase/tests/reporting-authz.test.sql` — staff calling
       `report_product_margin` raises `not_authorized`; no staff-visible function has a cost,
       margin or profit column in its return type (SC-018)
-- [ ] T108 [US7] `tests/integration/report-export.test.ts` — export matches the screen for the
+- [x] T108 [US7] `tests/integration/report-export.test.ts` — export matches the screen for the
       same range; CSV begins `EF BB BF` and Arabic survives a round trip; a product named
       `=SUM(A1:A9)` is written escaped; an empty range returns the marker; 5,000 rows complete
       (FR-081, FR-084, SC-020)
