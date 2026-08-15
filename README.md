@@ -16,8 +16,10 @@ bilingual search plus the scheduled jobs the free tier requires.
 **Deployable.** Merging to `main` runs [the deploy workflow](.github/workflows/deploy.yml):
 it verifies the commit, applies migrations to Supabase, builds the Workers bundle, publishes
 it and smoke-tests the result. Setting that up is a one-time pass through
-[the deployment guide](specs/001-egyptian-grocery-ecommerce/quickstart.md#deployment) — nine
-repository secrets, one variable, and one command to create the first admin account.
+[the deployment guide](specs/001-egyptian-grocery-ecommerce/quickstart.md#deployment) — ten
+repository secrets and one variable, all set through the GitHub web interface. Creating the
+first admin is a second workflow, run once from the Actions tab; no terminal is needed to get
+the shop live.
 
 Remaining, none of it blocking a launch: incremental listing loading (T112 — listings
 paginate today), the image and bundle audits (T119–T120), a throttled Lighthouse run (T121),

@@ -1,0 +1,93 @@
+name: Create the first admin account
+
+# Run this once, from the Actions tab, after the first successful deploy.
+#
+# Staff accounts are created by an administrator and never self-registered, so
+# on a brand-new project nobody can reach /admin to make the first one. This
+# breaks that cycle without needing a terminal: fill in a phone number and a
+# name, press the button.
+#
+# The password is NOT an input. Workflow inputs are shown in the run's page and
+# kept in its history, so typing a password there would publish it to anyone who
+# can see the repository. It is read from the BOOTSTRAP_ADMIN_PASSWORD secret
+# instead, which GitHub masks in logs.
+
+on:
+  workflow_dispatch:
+    inputs:
+      phone:
+        description: 'Mobile number, any usual way of writing it (e.g. 01001234567)'
+        required: true
+        type: string
+      name:
+        description: "The person's full name, as it should appear in the console"
+        required: true
+        type: string
+
+jobs:
+  bootstrap:
+    name: Create the admin
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # Fail with a sentence a person can act on, rather than with whatever the
+      # Supabase client says when handed an empty URL.
+      #
+      # Values reach the shell through `env:` rather than by `${{ }}` expansion
+      # into the script text. Expanding them inline would paste their contents
+      # into the command, so a value containing a quote would change what runs.
+      - name: Check the settings are in place
+        env:
+          SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          ADMIN_PASSWORD: ${{ secrets.BOOTSTRAP_ADMIN_PASSWORD }}
+        run: |
+          missing=""
+          [ -z "$SUPABASE_URL" ] && missing="${missing}  · NEXT_PUBLIC_SUPABASE_URL"$'\n'
+          [ -z "$SERVICE_KEY" ] && missing="${missing}  · SUPABASE_SERVICE_ROLE_KEY"$'\n'
+          [ -z "$ADMIN_PASSWORD" ] && missing="${missing}  · BOOTSTRAP_ADMIN_PASSWORD (the password this admin signs in with)"$'\n'
+          if [ -n "$missing" ]; then
+            echo "Missing repository secrets:"
+            echo "$missing"
+            echo "Add them under Settings → Secrets and variables → Actions, then run this again."
+            echo "::error::Required secrets are not set — see the log above for which."
+            exit 1
+          fi
+          echo "All three settings are present."
+
+      - run: npm ci
+
+      # Safe to run more than once: an existing account is promoted rather than
+      # duplicated, and its password is left alone.
+      - name: Create the admin account
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          ADMIN_PASSWORD: ${{ secrets.BOOTSTRAP_ADMIN_PASSWORD }}
+          # Likewise: a name is free text typed by a person, and interpolating
+          # it into the command line would let a quote in it run something else.
+          INPUT_PHONE: ${{ inputs.phone }}
+          INPUT_NAME: ${{ inputs.name }}
+        run: |
+          node --experimental-strip-types scripts/bootstrap-admin.ts \
+            --phone "$INPUT_PHONE" \
+            --name "$INPUT_NAME"
+
+      - name: What to do next
+        run: |
+          echo "Sign in at your site's /ar/login with that number and the password"
+          echo "you stored in BOOTSTRAP_ADMIN_PASSWORD."
+          echo
+          echo "Then open /ar/admin/governorates and set the delivery fee, the"
+          echo "minimum order value, and switch on each city you deliver to."
+          echo
+          echo "Once you are signed in you can create the rest of the staff from"
+          echo "/ar/admin/staff — this workflow is not needed again."

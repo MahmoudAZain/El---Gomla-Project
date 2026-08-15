@@ -247,6 +247,7 @@ GitHub → Settings → Secrets and variables → Actions.
 | `CRON_SECRET` | secret | Generate: `openssl rand -base64 32` |
 | `CLOUDFLARE_API_TOKEN` | secret | Cloudflare → My Profile → API Tokens |
 | `CLOUDFLARE_ACCOUNT_ID` | secret | Cloudflare dashboard sidebar |
+| `BOOTSTRAP_ADMIN_PASSWORD` | secret | Choose one — the first admin signs in with it |
 | `NEXT_PUBLIC_SITE_URL` | **variable** | The production origin, no trailing slash |
 
 `NEXT_PUBLIC_SITE_URL` is a *variable* rather than a secret because it is not one, and
@@ -266,8 +267,14 @@ the Worker never queries a column the database does not have yet.
 ### 5. Create the first admin
 
 Nobody can reach `/admin` yet: staff accounts are made by an administrator and never
-self-registered (FR-060), so the first one has to be made from outside the app. Run this
-once, locally:
+self-registered (FR-060), so the first one has to be made from outside the app.
+
+**From GitHub** — Actions → *Create the first admin account* → **Run workflow**. Fill in the
+phone number and name and press the button. The password is deliberately not a field: workflow
+inputs are recorded in the run's history where anyone with repository access can read them, so
+it comes from the `BOOTSTRAP_ADMIN_PASSWORD` secret instead.
+
+**Or locally**, if you would rather:
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=https://<ref>.supabase.co \
