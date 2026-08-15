@@ -18,6 +18,18 @@
     "binding": "ASSETS"
   },
 
+  // Stated rather than left to default, which is what the deploy warned about.
+  //
+  // `workers_dev` is what serves the shop at el-gomala.<subdomain>.workers.dev,
+  // and it is the address the site runs on until a real domain is added — too
+  // important to depend on an implicit default that could change.
+  //
+  // Preview URLs publish an extra copy of the site at a per-version address.
+  // Useful while iterating, but this is the live shop against the live
+  // database, so the fewer public copies of it the better.
+  "workers_dev": true,
+  "preview_urls": false,
+
   "observability": {
     "enabled": true
   },
@@ -26,12 +38,19 @@
   // The keep-alive is not optional: a free Supabase project pauses after seven
   // days without an API request, which would take the shop offline after a
   // quiet week (research R13, FR-069).
+  //
+  // The weekly two say `sun` rather than `0`. Cloudflare's API rejects `0` in
+  // the day-of-week field outright — `invalid cron string [code: 10100]` — and
+  // published accounts of its numbering disagree over whether the field runs
+  // 0-6 or 1-7. The three-letter name is accepted and means the same day under
+  // either reading, so it cannot be silently off by one. Getting that wrong
+  // would move the weekly export, which is the only backup this system has.
   "triggers": {
     "crons": [
-      "0 */6 * * *", // keep-alive — prevents free-tier database pausing
-      "0 3 * * *",   // sweep login_attempts older than 24h
-      "0 4 * * 0",   // reclaim storage objects no product_photos row references
-      "0 5 * * 0"    // weekly data export — the free tier has no backups
+      "0 */6 * * *",   // keep-alive — prevents free-tier database pausing
+      "0 3 * * *",     // sweep login_attempts older than 24h
+      "0 4 * * sun",   // reclaim storage objects no product_photos row references
+      "0 5 * * sun"    // weekly data export — the free tier has no backups
     ]
   },
 

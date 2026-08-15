@@ -17,13 +17,7 @@ import openNextWorker from '../.open-next/worker.js';
  * like anything else.
  */
 
-/** Which cron expression runs which job. Mirrors `triggers.crons`. */
-const SCHEDULE: Record<string, string> = {
-  '0 */6 * * *': '/api/cron/keepalive',
-  '0 3 * * *': '/api/cron/sweep',
-  '0 4 * * 0': '/api/cron/orphans',
-  '0 5 * * 0': '/api/cron/export',
-};
+import { SCHEDULE, normalizeCron } from './schedule';
 
 interface Env {
   CRON_SECRET?: string;
@@ -38,7 +32,7 @@ const worker = {
     env: Env,
     ctx: { waitUntil: (promise: Promise<unknown>) => void },
   ) {
-    const path = SCHEDULE[event.cron];
+    const path = SCHEDULE[normalizeCron(event.cron)];
 
     if (!path) {
       console.error(`no job mapped to cron "${event.cron}"`);
