@@ -140,9 +140,33 @@ if (!anonKey) {
 
   if (signInError) {
     console.log(`  ✗ NO — ${signInError.message}`);
-    console.log('\n  The account and BOOTSTRAP_ADMIN_PASSWORD disagree. Set that');
-    console.log('  secret to a password you choose, then run the admin workflow');
-    console.log('  again with "reset password" ticked.\n');
+
+    // The failure has to be read, not assumed. This script's first version
+    // reported every refusal as "the password disagrees", and the real answer
+    // was `Invalid API key` sitting in the line directly above it — a rejection
+    // that happens before any credential is examined, and points at an entirely
+    // different setting. Reporting a symptom as a cause is the thing this
+    // script exists to stop, so it should not do it either.
+    const message = signInError.message.toLowerCase();
+
+    if (message.includes('api key')) {
+      console.log('\n  ✗ This is NOT about the password. Supabase refused the key');
+      console.log('    before looking at any credential.');
+      console.log('\n    NEXT_PUBLIC_SUPABASE_ANON_KEY is wrong. Copy the Publishable');
+      console.log('    key (or the legacy `anon` key) from Project Settings → API Keys,');
+      console.log('    update that secret, then RE-RUN DEPLOY — the value is built into');
+      console.log('    the site, so changing the secret alone changes nothing.');
+      console.log('\n    The same wrong key is why the catalogue looks empty: every');
+      console.log('    query is refused the same way.\n');
+    } else if (message.includes('email not confirmed')) {
+      console.log('\n    The account is not confirmed. It should have been created');
+      console.log('    already confirmed — re-run the admin workflow.\n');
+    } else {
+      console.log('\n  The account and BOOTSTRAP_ADMIN_PASSWORD disagree. Set that');
+      console.log('  secret to a password you choose, then run the admin workflow');
+      console.log('  again with "reset password" ticked.\n');
+    }
+
     process.exit(1);
   }
 
