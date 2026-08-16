@@ -1,0 +1,47 @@
+name: Why can't the admin sign in
+
+# The login form says "Incorrect mobile number or password" and nothing else,
+# on purpose — a form that distinguished the two would be a way to discover
+# which numbers hold accounts. The cost is that whoever is locked out learns
+# nothing.
+#
+# This reports the state of the account from inside Actions, where the secrets
+# already are, so nobody has to paste a service-role key anywhere to find out
+# what is wrong. It prints no secret and no password.
+
+on:
+  workflow_dispatch:
+    inputs:
+      phone:
+        description: 'The mobile number that cannot sign in (e.g. 01001234567)'
+        required: true
+        type: string
+
+jobs:
+  diagnose:
+    name: Diagnose
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Values arrive through `env:` rather than `${{ }}` expansion into the
+      # script text: expanding a secret inline pastes its contents into the
+      # command, where a quote would change what runs.
+      - name: Diagnose
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          ADMIN_PASSWORD: ${{ secrets.BOOTSTRAP_ADMIN_PASSWORD }}
+          INPUT_PHONE: ${{ inputs.phone }}
+        run: |
+          node --experimental-strip-types scripts/diagnose-admin.ts --phone "$INPUT_PHONE"
