@@ -32,7 +32,14 @@
  *     --phone 01001234567 --name 'Mahmoud Zain'
  *
  * Safe to re-run: an existing account is promoted rather than duplicated, and
- * the password is left alone.
+ * the password is left alone unless `--reset-password` is passed.
+ *
+ * That flag exists because of a real lockout. A password pasted into a GitHub
+ * secret box easily carries a trailing newline or space; it becomes part of the
+ * stored credential but not part of what anyone types, so the account is
+ * created successfully and then refuses every sign-in. Nothing inside the app
+ * can recover from that — the reset it offers is staff-mediated, and there is
+ * no staff yet — so this is the only way back in.
  */
 
 import { createClient } from '@supabase/supabase-js';
@@ -48,9 +55,26 @@ function die(message: string): never {
   process.exit(1);
 }
 
+/** Present-as-a-switch, e.g. `--reset-password`. */
+function flag(name: string): boolean {
+  return process.argv.includes(`--${name}`);
+}
+
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const password = process.env.ADMIN_PASSWORD;
+const resetPassword = flag('reset-password');
+
+// Trimmed deliberately.
+//
+// Pasting into a GitHub secret box routinely picks up a trailing newline, and
+// GitHub stores it verbatim. Left in, it becomes part of the hashed password
+// while being no part of what anyone types — an account that is created without
+// complaint and then rejects the password its owner just chose. Nobody would
+// ever intend leading or trailing whitespace in a password typed on a phone
+// keyboard, so removing it costs nothing and prevents a lockout with no
+// self-service way out.
+const rawPassword = process.env.ADMIN_PASSWORD;
+const password = rawPassword?.trim();
 
 if (!url) die('NEXT_PUBLIC_SUPABASE_URL is not set.');
 if (!serviceKey) die('SUPABASE_SERVICE_ROLE_KEY is not set. Find it in Supabase → Settings → API.');
@@ -114,6 +138,13 @@ console.log(`\nBootstrapping admin on ${supabaseUrl}`);
 console.log(`  phone    ${phone}`);
 console.log(`  identity ${email}`);
 
+// Reported, not silent: if this line appears, the stored secret and the thing
+// its owner believes they chose are different strings, and they should fix the
+// secret rather than rely on this trim forever.
+if (rawPassword !== password) {
+  console.log('  · note: ADMIN_PASSWORD had leading or trailing whitespace, which was removed');
+}
+
 // ---------------------------------------------------------------------------
 // Already there?
 //
@@ -128,8 +159,21 @@ const { data: existingProfile } = await service
   .maybeSingle();
 
 if (existingProfile) {
+  // Asked for explicitly, because overwriting a working password by accident on
+  // a re-run would be its own kind of lockout.
+  if (resetPassword) {
+    const { error } = await service.auth.admin.updateUserById(existingProfile.id, { password });
+    if (error) die(`Could not reset the password: ${error.message}`);
+    console.log(`\n✓ Password reset for ${existingProfile.full_name}.`);
+  }
+
   if (existingProfile.role === 'admin') {
-    console.log(`\n✓ ${existingProfile.full_name} is already an admin. Nothing to do.\n`);
+    console.log(
+      resetPassword
+        ? '  Already an admin, so the role is unchanged.\n'
+        : `\n✓ ${existingProfile.full_name} is already an admin. Nothing to do.` +
+            '\n  To change the password, run again with --reset-password.\n',
+    );
     process.exit(0);
   }
 

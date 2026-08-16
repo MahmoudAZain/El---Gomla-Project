@@ -23,6 +23,11 @@ on:
         description: "The person's full name, as it should appear in the console"
         required: true
         type: string
+      reset_password:
+        description: 'Account exists but the password is refused? Tick this to set it to BOOTSTRAP_ADMIN_PASSWORD'
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   bootstrap:
@@ -76,10 +81,14 @@ jobs:
           # it into the command line would let a quote in it run something else.
           INPUT_PHONE: ${{ inputs.phone }}
           INPUT_NAME: ${{ inputs.name }}
+          INPUT_RESET: ${{ inputs.reset_password }}
         run: |
-          node --experimental-strip-types scripts/bootstrap-admin.ts \
-            --phone "$INPUT_PHONE" \
-            --name "$INPUT_NAME"
+          # Built as an array so the flag is either present or absent, rather
+          # than passed as an empty string the script would have to interpret.
+          args=(--phone "$INPUT_PHONE" --name "$INPUT_NAME")
+          [ "$INPUT_RESET" = "true" ] && args+=(--reset-password)
+
+          node --experimental-strip-types scripts/bootstrap-admin.ts "${args[@]}"
 
       - name: What to do next
         run: |
